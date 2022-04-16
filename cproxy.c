@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
           tv.tv_sec = 1;
           setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
           send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
-          fprintf(stderr,"Client sent a heartbeat to server:\n");
+          fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
           //heartbeat hits 3 so we assume the connection timed out and we close
           if (hbcount == 3)
           {
@@ -225,6 +225,7 @@ int main(int argc, char *argv[])
               fprintf(stderr, "Received message from telnet\n");
               setPacket(2, telnetbuf, telnetrecv, 1);
               send(SproxySocket, packetbuf, telnetrecv + 12, 0);
+              fprintf(stderr,"Forwarding telnet message to sproxy:%s\n",packetbuf);
               telnetrecv = 0;
             }
 

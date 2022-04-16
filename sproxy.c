@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
         tv.tv_sec = 1;
         setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
         send(newcproxysocket, packetbuf, 14, 0);//send the heartbeat
-        fprintf(stderr,"Server sent a heartbeat to client\n");
+        fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
         if (hbcount == 3)
         {
             hbcount = 0;
@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
             }
             else if (getPacketType(cproxybuf) == 1)
             {
-                fprintf(stderr,"heartbeat message received, resetting hbcount\n");
+                fprintf(stderr,"heartbeat message received, resetting hbcount: %s\n", cproxybuf);
                 hbcount = 0;
                 //of_index = 0;
                 //memset(overflowbuf, 0, 2048 * 100);
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
                break;
             }
 
-            fprintf(stderr,"sproxy received a message from daemon\n");
+            fprintf(stderr,"sproxy received a message from daemon: %s\n", daemonbuf);
             setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
             //memcpy(overflowbuf[of_index], packetbuf, tdRecv + 12);
             //of_index++;
