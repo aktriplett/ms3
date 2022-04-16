@@ -72,28 +72,28 @@ int CproxyConnect(int portno)
 
   return CproxySocket;
 }
-char* setPacket(int type, int id) {
-    bzero(packetbuf, sizeof(packetbuf));
-    char *p = packetbuf;
-    *((int*) p) = type;
-    p = p + sizeof(id);
-    *((int*) p) = id;
-    //memcpy(p, id);
-    //memcpy(packetbuf,p)
-    return packetbuf;
+// char* setPacket(int type, int id) {
+//     bzero(packetbuf, sizeof(packetbuf));
+//     char *p = packetbuf;
+//     *((int*) p) = type;
+//     p = p + sizeof(id);
+//     *((int*) p) = id;
+//     //memcpy(p, id);
+//     //memcpy(packetbuf,p)
+//     return packetbuf;
+// }
+char* setPacket(int type, char* payload, int len, int seq) {
+   bzero(packetbuf, sizeof(packetbuf));
+   char *p = packetbuf;
+   *((int*) p) = type;
+   p = p + 4;
+   *((int*) p) = seq;
+   p = p + 4;
+   *((int*) p) = len;
+   p = p + 4;
+   memcpy(p, payload, len);
+   return packetbuf;
 }
-//char* setPacket(int type, char* payload, int len, int seq) {
-//    bzero(packetbuf, sizeof(packetbuf));
-//    char *p = packetbuf;
-//    *((int*) p) = type;
-//    p = p + 4;
-//    *((int*) p) = seq;
-//    p = p + 4;
-//    *((int*) p) = len;
-//    p = p + 4;
-//    memcpy(p, payload, len);
-//    return packetbuf;
-//}
 
 int getPacketType(char* packet) {
     return *((int*) packet);
@@ -176,8 +176,7 @@ int main(int argc, char *argv[])
     {
         hbcount++;
         tv.tv_sec = 1;
-        //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
-        setPacket(1, sessionID);
+        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
         send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
         fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
         if (hbcount == 3)
@@ -238,8 +237,7 @@ int main(int argc, char *argv[])
                break;
             }
             fprintf(stderr,"sproxy received a message from daemon: %s\n", daemonbuf);
-            //setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
-            setPacket(2, daemonbuf);
+            setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
             //seqNum++;
             send(newcproxysocket, daemonbuf, daemonrecv, 0);//forward message from daemon to cproxy
             daemonrecv = 0;

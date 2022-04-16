@@ -79,29 +79,29 @@ int SproxyConnect(char *host, int portno)
 //  rannum = rand();
 //  return rannum;
 
-//char* setPacket(int type, char* payload, int len, int seq) {
-//    bzero(packetbuf, sizeof(packetbuf));
-//    char *p = packetbuf;
-//    *((int*) p) = type;
-//    p = p + 4;
-//    *((int*) p) = seq;
-//    p = p + 4;
-//    *((int*) p) = len;
-//    p = p + 4;
-//    memcpy(p, payload, len);
-//    return packetbuf;
-//}
-char* setPacket(int type, int id)
-{
-    bzero(packetbuf, sizeof(packetbuf));
-    char *p = packetbuf;
-    *((int*) p) = type;
-    p = p + sizeof(id);
-    *((int*) p) = id;
-    //memcpy(p, id);
-    //memcpy(packetbuf,p)
-    return packetbuf;
+char* setPacket(int type, char* payload, int len, int seq) {
+   bzero(packetbuf, sizeof(packetbuf));
+   char *p = packetbuf;
+   *((int*) p) = type;
+   p = p + 4;
+   *((int*) p) = seq;
+   p = p + 4;
+   *((int*) p) = len;
+   p = p + 4;
+   memcpy(p, payload, len);
+   return packetbuf;
 }
+// char* setPacket(int type, int id)
+// {
+//     bzero(packetbuf, sizeof(packetbuf));
+//     char *p = packetbuf;
+//     *((int*) p) = type;
+//     p = p + sizeof(id);
+//     *((int*) p) = id;
+//     //memcpy(p, id);
+//     //memcpy(packetbuf,p)
+//     return packetbuf;
+// }
 
 int getPacketType(char* packet) {
     return *((int*) packet);
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
 
       //set up the random hb int for the session and send to the server
       //sessionID = getSessionID();
-      setPacket(1, sessionID);//we know we have to send a heartbeat format message (ID 1)
+      setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
       send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
       fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
       //Begin message sending loop
