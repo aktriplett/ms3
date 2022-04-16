@@ -74,17 +74,31 @@ int SproxyConnect(char *host, int portno)
   return SproxySocket;
 }
 
+int getSessionID()
+  srand(time(0));// Use current time as seed for random generator
+  int rannum = rand());
+  return rannum;
 
-char* setPacket(int type, char* payload, int len, int seq) {
+//char* setPacket(int type, char* payload, int len, int seq) {
+//    bzero(packetbuf, sizeof(packetbuf));
+//    char *p = packetbuf;
+//    *((int*) p) = type;
+//    p = p + 4;
+//    *((int*) p) = seq;
+//    p = p + 4;
+//    *((int*) p) = len;
+//    p = p + 4;
+//    memcpy(p, payload, len);
+//    return packetbuf;
+//}
+char* setPacket(int type, int id) {
     bzero(packetbuf, sizeof(packetbuf));
     char *p = packetbuf;
     *((int*) p) = type;
-    p = p + 4;
-    *((int*) p) = seq;
-    p = p + 4;
-    *((int*) p) = len;
-    p = p + 4;
-    memcpy(p, payload, len);
+    p = p + sizeof(id);
+    *((int*) p) = id;
+    //memcpy(p, id);
+    //memcpy(packetbuf,p)
     return packetbuf;
 }
 
@@ -131,7 +145,7 @@ int main(int argc, char *argv[])
       {
         error("ERROR on telnet accept\n");
       }
-      fprintf(stderr,"Connected to a client on telnet\n");
+      fprintf(stderr,"Connected to telnet local host\n");
 
       //connect to sproxy
       if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
@@ -140,41 +154,36 @@ int main(int argc, char *argv[])
       }
       fprintf(stderr,"Connected to sproxy\n");
 
-      ////////////////////////////////////////////////////////////////
-      ////////////////////////////////////////////////////////////////
-      ////////////////////////////////////////////////////////////////
-
       //set vars for select
       fd_set readfds;
-      // clear the set
-      FD_ZERO(&readfds);
-      // add descriptors (fd) to set
-      FD_SET(newtelnetsocket, &readfds);
+      FD_ZERO(&readfds);// clear the set
+      FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
       FD_SET(SproxySocket, &readfds);
       //n = SproxySocket + 1;
-      // find the largest descriptor, and plus one.
-      if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
+      if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
       else n = SproxySocket + 1;
-
-      //timeout is 1 sec to increment hbcount
       struct timeval tv;
-      tv.tv_sec = 1;
+      tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
       tv.tv_usec = 0;
       int hbcount = 0;
+      int sessionID = 0;
 
+      //set up the random hb int for the session and send to the server
+      sessionID = getSessionID();
+      setPacket(1, sessionID);//we know we have to send a heartbeat format message (ID 1)
+      send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
+      fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
       //Begin message sending loop
       while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
       //while(1)
       {
-        //rv = select(n, &readfds, NULL, NULL, &tv))
-
         if (rv < 0)
         {
           error("ERROR on select function\n");
           break;
         }
 
-        if (rv == 0)//Timeout occured, no message received so sending heartbeat
+        else if (rv == 0)//Timeout occured, no message received so sending heartbeat
         {
           //check if this needs to be int or pointer
           hbcount++;
@@ -250,7 +259,7 @@ int main(int argc, char *argv[])
               }
               else if (getPacketType(sproxybuf) == 1)//we received a heartbeat from sproxy and  will reset the hbcount
               {
-                  fprintf(stderr, "Got a heartbeat: %d\n", hbcount);
+                  fprintf(stderr, "Got a heartbeat: %d\n", sproxybuf;
                   hbcount = 0;
               }
               else
@@ -281,9 +290,3 @@ int main(int argc, char *argv[])
   }
   return 0;
 }
-
-
-    // Use current time as seed for random generator, move this to its own function
-    //srand(time(0));
-    //int rannum = rand());
-    //strcpy(hbID,rannum);

@@ -72,19 +72,28 @@ int CproxyConnect(int portno)
 
   return CproxySocket;
 }
-
-char* setPacket(int type, char* payload, int len, int seq) {
+char* setPacket(int type, int id) {
     bzero(packetbuf, sizeof(packetbuf));
     char *p = packetbuf;
     *((int*) p) = type;
-    p = p + 4;
-    *((int*) p) = seq;
-    p = p + 4;
-    *((int*) p) = len;
-    p = p + 4;
-    memcpy(p, payload, len);
+    p = p + sizeof(id);
+    *((int*) p) = id;
+    //memcpy(p, id);
+    //memcpy(packetbuf,p)
     return packetbuf;
 }
+//char* setPacket(int type, char* payload, int len, int seq) {
+//    bzero(packetbuf, sizeof(packetbuf));
+//    char *p = packetbuf;
+//    *((int*) p) = type;
+//    p = p + 4;
+//    *((int*) p) = seq;
+//    p = p + 4;
+//    *((int*) p) = len;
+//    p = p + 4;
+//    memcpy(p, payload, len);
+//    return packetbuf;
+//}
 
 int getPacketType(char* packet) {
     return *((int*) packet);
@@ -142,24 +151,17 @@ int main(int argc, char *argv[])
   }
   fprintf(stderr,"Connected to telnet daemon\n");
 
-  ////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////
   //set vars for select
-  // clear the set
-  FD_ZERO(&readfds);
-  // add descriptors (fd) to set
-  FD_SET(newcproxysocket, &readfds);
+  FD_ZERO(&readfds);// clear the set
+  FD_SET(newcproxysocket, &readfds);// add descriptors (fd) to set
   FD_SET(DaemonSocket, &readfds);
-
-  // find the largest descriptor, and plus one.
-  if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;
+  if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;  // find the largest descriptor, and plus one.
   else n = DaemonSocket + 1;
   //n = DaemonSocket + 1;
   tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
   tv.tv_usec = 0;
   int hbcount = 0;
-
+  int sessionID = 0;
   fprintf(stderr,"Entering the message loop on server\n");
 
   while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
@@ -174,8 +176,9 @@ int main(int argc, char *argv[])
     {
         hbcount++;
         tv.tv_sec = 1;
-        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
-        send(newcproxysocket, packetbuf, 14, 0);//send the heartbeat
+        //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
+        setPacket(1, sessionID);
+        send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
         fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
         if (hbcount == 3)
         {
@@ -191,7 +194,6 @@ int main(int argc, char *argv[])
             fprintf(stderr,"sproxy reconnected to cproxy\n");
          }
       }
-
       else //no timeout, rv = 1 and we have a message to send
       {
         fprintf(stderr,"no timeout, we have a message\n");
@@ -218,9 +220,13 @@ int main(int argc, char *argv[])
             else if (getPacketType(cproxybuf) == 1)
             {
                 fprintf(stderr,"heartbeat message received, resetting hbcount: %s\n", cproxybuf);
+                if (sessionID == 0)
+                {
+                  char* contents_chopped = cproxybuf+ 4;
+                  memcpy(sessionID, contents_chopped)
+                  fprintf(stderr,"assigned a new sessionID %s\n", sessionID);
+                }
                 hbcount = 0;
-                //of_index = 0;
-                //memset(overflowbuf, 0, 2048 * 100);
             }
         }
         if (FD_ISSET(DaemonSocket, &readfds))
@@ -232,10 +238,9 @@ int main(int argc, char *argv[])
                break;
             }
             fprintf(stderr,"sproxy received a message from daemon: %s\n", daemonbuf);
-            setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
-            //memcpy(overflowbuf[of_index], packetbuf, tdRecv + 12);
-            //of_index++;
-            seqNum++;
+            //setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
+            setPacket(2, daemonbuf);
+            //seqNum++;
             send(newcproxysocket, daemonbuf, daemonrecv, 0);//forward message from daemon to cproxy
             daemonrecv = 0;
         }
