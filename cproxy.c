@@ -170,30 +170,19 @@ int main(int argc, char *argv[])
       tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
       tv.tv_usec = 0;
       int hbcount = 0;
-
       //set up the random hb int for the session and send to the server
       //sessionID = getSessionID();
-      setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
-      send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
-      fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
+
       //Begin message sending loop
       while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
-      //while(1)
       {
-        if (rv < 0)
-        {
-          error("ERROR on select function\n");
-          break;
-        }
+        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
+        send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
+        fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
 
-        else if (rv == 0)//Timeout occured, no message received so sending heartbeat
+        if (rv == 0)//Timeout occured, no message received so sending heartbeat
         {
-          //check if this needs to be int or pointer
           hbcount++;
-          tv.tv_sec = 1;
-          setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
-          send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
-          fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
           //heartbeat hits 3 so we assume the connection timed out and we close
           if (hbcount == 3)
           {
@@ -216,7 +205,7 @@ int main(int argc, char *argv[])
             fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
           }
         }
-        else //no timeout, rv = 1 and we have received
+        else if (rv > 0)//no timeout, rv = 1 and we have received
         {
           fprintf(stderr,"zeroing buffers to receive message\n");
           //zero out both message buffers
@@ -271,22 +260,22 @@ int main(int argc, char *argv[])
               }
             }
           }
-          fprintf(stderr, "I'm getting ready to send/recv more messages\n");
-          //clear everything and get ready for more messages
-          FD_ZERO(&readfds);
-          FD_SET(newtelnetsocket, &readfds);
-          FD_SET(SproxySocket, &readfds);
-          //n = newtelnetsocket + 1;
-          //if (n <= SproxySocket + 1)
-          //{
-          //    n = SproxySocket + 1;
-          //}
-          if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
-          else n = SproxySocket + 1;
         }
-    }
+        else
+        {
+          fprintf(stderr, "no timeout, no messages\n");
+        }
+        fprintf(stderr, "I'm getting ready to send/recv more messages\n");
+        //clear everything and get ready for more messages
+        FD_ZERO(&readfds);
+        FD_SET(newtelnetsocket, &readfds);
+        FD_SET(SproxySocket, &readfds);
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+        if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
+        else n = SproxySocket + 1;
+      }
     fprintf(stderr,"Timed out - Closing all connections and setting new IP:\n");
-    //assignNewIP(next_ip);
     close(newtelnetsocket);
     close(SproxySocket);
     break;
