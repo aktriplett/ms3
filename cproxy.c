@@ -79,7 +79,8 @@ int SproxyConnect(char *host, int portno)
 //  rannum = rand();
 //  return rannum;
 
-char* setPacket(int type, char* payload, int len, int seq) {
+char* setPacket(int type, char* payload, int len, int seq)
+{
    bzero(packetbuf, sizeof(packetbuf));
    char *p = packetbuf;
    *((int*) p) = type;
@@ -103,17 +104,18 @@ char* setPacket(int type, char* payload, int len, int seq) {
 //     return packetbuf;
 // }
 
-int getPacketType(char* packet) {
+int getPacketType(char* packet)
+{
     return *((int*) packet);
 }
 
-char* getPacketMsg(char* packet) {
+char* getPacketMsg(char* packet)
+{
     return packet + 12;
 }
 //main function
 int main(int argc, char *argv[])
 {
-    //srand(time(0));// Use current time as seed for random generator
     //have all necessary command line arguments been given
     if (argc < 4) //or should this be 3
     {
@@ -168,7 +170,6 @@ int main(int argc, char *argv[])
       tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
       tv.tv_usec = 0;
       int hbcount = 0;
-      int sessionID = 8;
 
       //set up the random hb int for the session and send to the server
       //sessionID = getSessionID();
