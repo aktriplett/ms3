@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 
             if (newcproxysocket < 0)
             {
-              error("ERROR on cproxy accept");
+              error("ERROR on NEW cproxy accept");
             }
 
             FD_SET(newcproxysocket, &readfds);
