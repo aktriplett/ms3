@@ -75,8 +75,8 @@ int SproxyConnect(char *host, int portno)
 }
 
 int getSessionID()
-  srand(time(0));// Use current time as seed for random generator
-  int rannum = rand());
+  int rannum = 0;
+  rannum = rand();
   return rannum;
 
 //char* setPacket(int type, char* payload, int len, int seq) {
@@ -91,7 +91,8 @@ int getSessionID()
 //    memcpy(p, payload, len);
 //    return packetbuf;
 //}
-char* setPacket(int type, int id) {
+char* setPacket(int type, int id)
+{
     bzero(packetbuf, sizeof(packetbuf));
     char *p = packetbuf;
     *((int*) p) = type;
@@ -112,6 +113,7 @@ char* getPacketMsg(char* packet) {
 //main function
 int main(int argc, char *argv[])
 {
+    srand(time(0));// Use current time as seed for random generator
     //have all necessary command line arguments been given
     if (argc < 4) //or should this be 3
     {
