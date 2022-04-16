@@ -219,12 +219,12 @@ int main(int argc, char *argv[])
             else if (getPacketType(cproxybuf) == 1)
             {
                 fprintf(stderr,"heartbeat message received, resetting hbcount: %s\n", cproxybuf);
-                if (sessionID == 0)
-                {
-                  char* contents_chopped = cproxybuf+ 4;
-                  memcpy(sessionID, contents_chopped)
-                  fprintf(stderr,"assigned a new sessionID %s\n", sessionID);
-                }
+                //if (sessionID == 0)
+                //{
+                //  char* contents_chopped = cproxybuf+ 4;
+                //  memcpy(sessionID, contents_chopped)
+                //  fprintf(stderr,"assigned a new sessionID %s/n", sessionID);
+                //}
                 hbcount = 0;
             }
         }
