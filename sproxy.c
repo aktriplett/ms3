@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
   //fprintf(stderr,"I'm listening\n");
   listen(CproxySocket, 5);
   fprintf(stderr,"I'm listening on cproxy\n");
-
+  sleep(20);
   int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
   if (newcproxysocket < 0)
   {
