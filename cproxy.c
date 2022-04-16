@@ -18,17 +18,22 @@ void error(char *msg)
 //initialize vars
 struct sockaddr_in telnet_addr, sproxy_addr;
 char telnetbuf[BUFFERSIZE], sproxybuf[BUFFERSIZE], packetbuf[BUFFERSIZE];
-//int *hbID = 0;//this points to hbid at pos 0
-//int option = 1;
+int option = 1;
 
 //FUNCTIONS
 //telnet connect function
 int TelnetConnect(int portno)
 {
-  //initialize socket structure
-
+  // Create socket
+  int TelnetSocket = socket(AF_INET, SOCK_STREAM, 0);
+  setsockopt(TelnetSocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+  if (TelnetSocket < 0)
+  {
+    error("ERROR opening Telnet socket");
+  }
   //clearing telnet_addr with bzero method
   bzero((char *) &telnet_addr, sizeof(telnet_addr));
+
   //saying to server address, all will be in internet address concept
   telnet_addr.sin_family = AF_INET;
   // get your address on your own when you start the program
@@ -36,18 +41,10 @@ int TelnetConnect(int portno)
   // convert integer format to network format with htons
   telnet_addr.sin_port = htons(portno);
 
-  // Create socket
-  int TelnetSocket = socket(AF_INET, SOCK_STREAM, 0);
-  //setsockopt(TelnetSocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
-  if (TelnetSocket < 0)
-  {
-    error("ERROR creating Telnet socket\n");
-  }
-
   // Bind socket
   if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
   {
-    error("ERROR on binding Telnet Socket\n");
+    error("ERROR on binding Telnet Socket");
   }
 
   return TelnetSocket;
@@ -56,20 +53,22 @@ int TelnetConnect(int portno)
 //server proxy connect function
 int SproxyConnect(char *host, int portno)
 {
-  //initialize socket structure
+  // Create socket
+  int SproxySocket = socket(AF_INET, SOCK_STREAM, 0);
+  setsockopt(SproxySocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+
+  if (SproxySocket < 0)
+  {
+    error("ERROR opening Sproxy socket");
+  }
+
   bzero((char *) &sproxy_addr, sizeof(sproxy_addr));
+
   sproxy_addr.sin_family = AF_INET;
   inet_aton(host, &sproxy_addr.sin_addr.s_addr);
   sproxy_addr.sin_port = htons(portno);
-  fprintf(stderr,"Received and converted server IP\n");
 
-  // Create socket
-  int SproxySocket = socket(AF_INET, SOCK_STREAM, 0);
-  //setsockopt(SproxySocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
-  if (SproxySocket < 0)
-  {
-    error("ERROR opening Sproxy socket\n");
-  }
+  fprintf(stderr,"Received and converted server IP\n");
 
   return SproxySocket;
 }
@@ -111,25 +110,19 @@ int main(int argc, char *argv[])
       fprintf(stderr, "usage %s hostname port\n", argv[0]);
       exit(0);
     }
-
-    //port no passed in command line arg, to convert character to int we use atoi
-    int telnetport = atoi(argv[1]);
-    int sproxyport = atoi(argv[3]);
-
-    //calling socket set up functions
-    int TelnetSocket = TelnetConnect(telnetport);
-    int SproxySocket = SproxyConnect(argv[2],sproxyport);
-    //char *ip = argv[2];
-
-
-    listen(TelnetSocket, 5);
-    fprintf(stderr,"I'm listening on telnet\n");
-    //set vars for receiving and sending messages
     socklen_t len1;
     int rv;
     int n, len = 0;
     int telnetrecv = 0;
     int sproxyrecv = 0;
+    int telnetport = atoi(argv[1]);//port no passed in command line arg, to convert character to int we use atoi
+    int sproxyport = atoi(argv[3]);
+    //calling socket set up functions
+    int TelnetSocket = TelnetConnect(telnetport);
+    int SproxySocket = SproxyConnect(argv[2],sproxyport);
+
+    listen(TelnetSocket, 5);
+    fprintf(stderr,"I'm listening on telnet\n");
 
     while(1)
     {
