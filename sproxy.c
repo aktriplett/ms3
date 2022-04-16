@@ -19,14 +19,13 @@ void error(char *msg)
 struct sockaddr_in daemon_addr, cproxy_addr;
 char *daemonip = "127.0.0.1";
 char daemonbuf[BUFFERSIZE], cproxybuf[BUFFERSIZE], packetbuf[BUFFERSIZE];
-fd_set readfds;
-//int option = 1;
+int option = 1;
 
 int DaemonConnect()
 {
   // Create socket.
   int DaemonSocket = socket(AF_INET, SOCK_STREAM, 0);
-  //setsockopt(DaemonSocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+  setsockopt(DaemonSocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
   if (DaemonSocket < 0)
   {
     error("ERROR opening Daemon socket");
@@ -49,7 +48,7 @@ int CproxyConnect(int portno)
 {
   // Create socket.
   int CproxySocket = socket(AF_INET, SOCK_STREAM, 0);
-  //setsockopt(CproxySocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+  setsockopt(CproxySocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
   if (CproxySocket < 0)
   {
     error("ERROR opening Cproxy socket");
@@ -72,16 +71,7 @@ int CproxyConnect(int portno)
 
   return CproxySocket;
 }
-// char* setPacket(int type, int id) {
-//     bzero(packetbuf, sizeof(packetbuf));
-//     char *p = packetbuf;
-//     *((int*) p) = type;
-//     p = p + sizeof(id);
-//     *((int*) p) = id;
-//     //memcpy(p, id);
-//     //memcpy(packetbuf,p)
-//     return packetbuf;
-// }
+
 char* setPacket(int type, char* payload, int len, int seq) {
    bzero(packetbuf, sizeof(packetbuf));
    char *p = packetbuf;
