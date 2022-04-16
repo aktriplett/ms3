@@ -194,14 +194,8 @@ int main(int argc, char *argv[])
 
             if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
             {
-              error("ERROR connecting new sproxy\n");
+              error("ERROR connecting NEW sproxy\n");
             }
-
-            FD_CLR(SproxySocket, &readfds);
-            FD_SET(SproxySocket, &readfds);
-            if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
-            else n = SproxySocket + 1;
-            //n = SproxySocket + 1;
             fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
           }
         }

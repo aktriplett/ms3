@@ -176,6 +176,7 @@ int main(int argc, char *argv[])
         if (hbcount == 3)
         {
             hbcount = 0;
+            close(newcproxysocket);
             int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
 
             if (newcproxysocket < 0)
