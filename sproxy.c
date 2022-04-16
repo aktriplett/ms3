@@ -156,9 +156,7 @@ int main(int argc, char *argv[])
   //if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;
   //else n = DaemonSocket + 1;
   n = DaemonSocket + 1;
-  //timeout is 1 sec to increment hbcount
-  struct timeval tv;
-  tv.tv_sec = 1;
+  tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
   tv.tv_usec = 0;
   int hbcount = 0;
 
@@ -172,7 +170,7 @@ int main(int argc, char *argv[])
       error("ERROR on select function\n");
       break;
     }
-    if (rv == 0)//Timeout occured, no message received so sending heartbeat
+    else if (rv == 0)//Timeout occured, no message received so sending heartbeat
     {
         hbcount++;
         tv.tv_sec = 1;
@@ -194,17 +192,15 @@ int main(int argc, char *argv[])
          }
       }
 
-      //else //no timeout, rv = 1 and we have a message to send
-      //{
+      else //no timeout, rv = 1 and we have a message to send
+      {
         fprintf(stderr,"no timeout, we have a message\n");
-        //zero out both message buffers
-        bzero(daemonbuf, sizeof(daemonbuf));
+        bzero(daemonbuf, sizeof(daemonbuf));//zero out both message buffers
         bzero(cproxybuf, sizeof(cproxybuf));
 
         if (FD_ISSET(newcproxysocket, &readfds))
         {
             cproxyrecv = recv(newcproxysocket, cproxybuf, sizeof(cproxybuf), 0);
-
             if (cproxyrecv <= 0)
             {
               error("ERROR on cproxy receive");
@@ -230,13 +226,11 @@ int main(int argc, char *argv[])
         if (FD_ISSET(DaemonSocket, &readfds))
         {
             daemonrecv = recv(DaemonSocket, daemonbuf, sizeof(daemonbuf), 0);
-
             if (daemonrecv <= 0)
             {
                error("ERROR on daemon receive");
                break;
             }
-
             fprintf(stderr,"sproxy received a message from daemon: %s\n", daemonbuf);
             setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
             //memcpy(overflowbuf[of_index], packetbuf, tdRecv + 12);
@@ -246,16 +240,14 @@ int main(int argc, char *argv[])
             daemonrecv = 0;
         }
 
-      //}
+      }
       fprintf(stderr,"I'm waiting for a new message on sproxy\n");
-
       FD_ZERO(&readfds);
       FD_SET(newcproxysocket, &readfds);
       FD_SET(DaemonSocket, &readfds);
       if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;
       else n = DaemonSocket + 1;
     }
-  }
   fprintf(stderr,"Closing server side sockets\n");
   close(DaemonSocket,2);
   close(CproxySocket,2);
