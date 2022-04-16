@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
               }
               else if (getPacketType(sproxybuf) == 1)//we received a heartbeat from sproxy and  will reset the hbcount
               {
-                  fprintf(stderr, "Got a heartbeat: %d\n", sproxybuf;
+                  fprintf(stderr, "Got a heartbeat: %s\n", sproxybuf);
                   hbcount = 0;
               }
               else
