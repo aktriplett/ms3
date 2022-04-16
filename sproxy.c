@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
   int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
   if (newcproxysocket < 0)
   {
-    error("ERROR on cproxy accept");
+    error("ERROR on first cproxy accept");
   }
   fprintf(stderr,"Connected to a client on cproxy\n");
 
