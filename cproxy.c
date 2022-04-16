@@ -74,10 +74,10 @@ int SproxyConnect(char *host, int portno)
   return SproxySocket;
 }
 
-int getSessionID()
-  int rannum = 0;
-  rannum = rand();
-  return rannum;
+//int getSessionID()
+//int rannum = 0;
+//  rannum = rand();
+//  return rannum;
 
 //char* setPacket(int type, char* payload, int len, int seq) {
 //    bzero(packetbuf, sizeof(packetbuf));
@@ -113,7 +113,7 @@ char* getPacketMsg(char* packet) {
 //main function
 int main(int argc, char *argv[])
 {
-    srand(time(0));// Use current time as seed for random generator
+    //srand(time(0));// Use current time as seed for random generator
     //have all necessary command line arguments been given
     if (argc < 4) //or should this be 3
     {
@@ -168,10 +168,10 @@ int main(int argc, char *argv[])
       tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
       tv.tv_usec = 0;
       int hbcount = 0;
-      int sessionID = 0;
+      int sessionID = 8;
 
       //set up the random hb int for the session and send to the server
-      sessionID = getSessionID();
+      //sessionID = getSessionID();
       setPacket(1, sessionID);//we know we have to send a heartbeat format message (ID 1)
       send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
       fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
