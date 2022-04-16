@@ -153,9 +153,9 @@ int main(int argc, char *argv[])
   FD_SET(DaemonSocket, &readfds);
 
   // find the largest descriptor, and plus one.
-  //if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;
-  //else n = DaemonSocket + 1;
-  n = DaemonSocket + 1;
+  if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;
+  else n = DaemonSocket + 1;
+  //n = DaemonSocket + 1;
   tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
   tv.tv_usec = 0;
   int hbcount = 0;

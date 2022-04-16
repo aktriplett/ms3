@@ -151,10 +151,10 @@ int main(int argc, char *argv[])
       // add descriptors (fd) to set
       FD_SET(newtelnetsocket, &readfds);
       FD_SET(SproxySocket, &readfds);
-      n = SproxySocket + 1;
+      //n = SproxySocket + 1;
       // find the largest descriptor, and plus one.
-      //if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
-      //else n = SproxySocket + 1;
+      if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
+      else n = SproxySocket + 1;
 
       //timeout is 1 sec to increment hbcount
       struct timeval tv;
@@ -198,9 +198,9 @@ int main(int argc, char *argv[])
 
             FD_CLR(SproxySocket, &readfds);
             FD_SET(SproxySocket, &readfds);
-            //if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
-            //else n = SproxySocket + 1;
-            n = SproxySocket + 1;
+            if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
+            else n = SproxySocket + 1;
+            //n = SproxySocket + 1;
             fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
           }
         }
@@ -264,13 +264,13 @@ int main(int argc, char *argv[])
           FD_ZERO(&readfds);
           FD_SET(newtelnetsocket, &readfds);
           FD_SET(SproxySocket, &readfds);
-          n = newtelnetsocket + 1;
-          if (n <= SproxySocket + 1)
-          {
-              n = SproxySocket + 1;
-          }
-          //if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
-          //else n = SproxySocket + 1;
+          //n = newtelnetsocket + 1;
+          //if (n <= SproxySocket + 1)
+          //{
+          //    n = SproxySocket + 1;
+          //}
+          if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
+          else n = SproxySocket + 1;
         }
     }
     fprintf(stderr,"Timed out - Closing all connections and setting new IP:\n");
