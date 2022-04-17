@@ -180,8 +180,12 @@ int main(int argc, char *argv[])
                 error("ERROR on telnet receive\n");
                 break;
               }
-              fprintf(stderr, "Received message from telnet\n");
-              send(SproxySocket, buf1, len, 0);
+              else
+              {
+                setPacket(2, buf1, len, 1);
+                send(SproxySocket, buf1, len, 0);
+                len = 0;
+              }
           }
 
           if (FD_ISSET(SproxySocket, &readfds))
@@ -192,8 +196,26 @@ int main(int argc, char *argv[])
                 error("ERROR on sproxy receive\n");
                 break;
               }
-              fprintf(stderr, "Received message from sproxy\n");
-              send(newtelnetsocket, buf2, len, 0);
+              else
+              {
+                if (getPacketType(buf2) == 2)//we are forwarding the sproxy message to telnet
+                {
+                    fprintf(stderr, "Got a ping\n");
+                    send(newtelnetsocket, getPacketMsg(buf2), len - 12, 0);
+                    len = 0;
+                }
+                else if (getPacketType(buf2) == 1)//we received a heartbeat from sproxy and  will reset the hbcount
+                {
+                    fprintf(stderr, "Got a heartbeat\n");
+                    hbcount = 0;
+                    len = 0;
+                }
+                else
+                {
+                  fprintf(stderr, "Inside sproxy buffer\n");
+                  len = 0;
+                }
+              }
           }
         }
         FD_ZERO(&readfds);// clear the set
