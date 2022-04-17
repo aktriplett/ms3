@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
     while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
     {
       setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
-      fprintf(stderr, "set the hb packet\n");
+      //fprintf(stderr, "set the hb packet\n");
       send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
       fprintf(stderr,"Client sent a heartbeat message to server:\n");
       if (rv == 0)
@@ -154,7 +154,6 @@ int main(int argc, char *argv[])
         {
           fprintf(stderr,"hb hit three, reset\n");
           hbcount = 0;//reset hb count
-          fprintf(stderr, "reset hb\n");
           close(SproxySocket);//close disconnected socket
 
           int SproxySocket = SproxyConnect(argv[2],sproxyport);
@@ -163,6 +162,8 @@ int main(int argc, char *argv[])
           {
             error("ERROR connecting NEW sproxy\n");
           }
+          FD_ZERO(&readfds);// clear the set ahead of time
+          FD_SET(SproxySocket, &readfds);
           fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
         }
       }
