@@ -1,7 +1,7 @@
 all: cproxym2 sproxym2
 
 cproxym2: cproxym2.c
-	cc cproxy2.c -o cproxy2
+	cc cproxym2.c -o cproxym2
 
 sproxym2: sproxym2.c
 	cc sproxym2.c -o sproxym2
