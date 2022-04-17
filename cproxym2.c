@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
       setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
       fprintf(stderr, "set the hb packet\n");
       send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
-      fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
+      fprintf(stderr,"Client sent a heartbeat message to server:\n");
       if (rv == 0)
       {
         hbcount++;
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
             else
             {
               //setPacket(2, buf1, len, 1);
-              send(SproxySocket, buf1, len, 0);
+              //send(SproxySocket, buf1, len, 0);
               //len = 0;
             }
         }
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-              send(newtelnetsocket, buf2, len, 0);
+              //send(newtelnetsocket, buf2, len, 0);
               //if (getPacketType(buf2) == 2)//we are forwarding the sproxy message to telnet
               //{
               //     fprintf(stderr, "Got a ping\n");

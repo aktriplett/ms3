@@ -140,8 +140,8 @@ int main(int argc, char *argv[])
   {
     setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
     fprintf(stderr, "set the hb packet\n");
-    //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
-
+    send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
+    fprintf(stderr,"server send message to client:\n");
     if (rv == 0)
     {
       hbcount++;
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
 
           else
            {
-             send(DaemonSocket, buf1, len, 0);
+             //send(DaemonSocket, buf1, len, 0);
              //fprintf(stderr, "Inside cproxy buffer\n");
              //len = 0;
            }
@@ -205,7 +205,8 @@ int main(int argc, char *argv[])
            }
            else
            {
-             send(newcproxysocket, buf2, len, 0);
+             //send(newcproxysocket, buf2, len, 0);
+             //fprintf(stderr, "Inside cproxy buffer\n");
            }
            //setPacket(2, daemonbuf, len, seqNum); //not a heartbeat, other message
            //send(newcproxysocket, buf2, len, 0);
