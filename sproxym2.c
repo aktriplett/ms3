@@ -164,30 +164,28 @@ int main(int argc, char *argv[])
       }
       else
       {
-         bzero(buf1, sizeof(buf1));
-         bzero(buf2, sizeof(buf2));
+         bzero(cproxybuf, sizeof(cproxybuf));
+         bzero(daemonbuf, sizeof(daemonbuf));
          // one or both of the descriptors have data
          if (FD_ISSET(newcproxysocket, &readfds))
          {
-             len = recv(newcproxysocket, buf1, sizeof(buf1), 0);
-             if (len < 0)
+             cproxyrecv = recv(newcproxysocket, cproxybuf, sizeof(cproxybuf), 0);
+             if (cproxyrecv < 0)
              {
                error("ERROR on cproxy receive\n");
                break;
              }
-             fprintf(stderr, "Received message from cproxy\n");
-             send(DaemonSocket, buf1, len, 0);
+             send(DaemonSocket, cproxybufcproxybuf, cproxyrecv, 0);
          }
          if (FD_ISSET(DaemonSocket, &readfds))
          {
-             len = recv(DaemonSocket, buf2, sizeof(buf2), 0);
-             if (len < 0)
+             daemonrecv = recv(DaemonSocket, daemonbuf, sizeof(daemonbuf), 0);
+             if (daemonrecv < 0)
              {
                error("ERROR on daemon receive\n");
                break;
              }
-             fprintf(stderr, "Received message from daemon\n");
-             send(newcproxysocket, buf2, len, 0);
+             send(newcproxysocket, daemonbuf, daemonrecv, 0);
          }
        }
        FD_ZERO(&readfds);// clear the set ahead of time
