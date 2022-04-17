@@ -149,17 +149,17 @@ int main(int argc, char *argv[])
       {
           fprintf(stderr, "reset hb\n");
           hbcount = 0;
-          //fprintf(stderr,"hb hit three, reset\n");
-          // close(newcproxysocket);
-          // int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
-          //
-          // if (newcproxysocket < 0)
-          // {
-          //   error("ERROR on NEW cproxy accept");
-          // }
-          //
-          // FD_SET(newcproxysocket, &readfds);
-          // fprintf(stderr,"sproxy reconnected to cproxy\n");
+          fprintf(stderr,"hb hit three, reset\n");
+          close(newcproxysocket);
+          int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
+
+          if (newcproxysocket < 0)
+          {
+            error("ERROR on NEW cproxy accept");
+          }
+
+          FD_SET(newcproxysocket, &readfds);
+          fprintf(stderr,"sproxy reconnected to cproxy\n");
        }
     }
     else
