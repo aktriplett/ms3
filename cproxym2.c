@@ -113,87 +113,90 @@ int main(int argc, char *argv[])
     listen(TelnetSocket, 5);
 
     while(1)
+    {
+      fprintf(stderr,"I'm listening on telnet\n");
+
+      int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
+      if (newtelnetsocket < 0)
+      {
+        error("ERROR on telnet accept");
+      }
+      fprintf(stderr,"Connected to telnet local host\n");
+
+      //connect to sproxy
+      if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
+      {
+        error("ERROR connecting to sproxy");
+      }
+      fprintf(stderr,"Connected to sproxy\n");
+
+      FD_ZERO(&readfds);// clear the set
+      FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
+      FD_SET(SproxySocket, &readfds);
+      if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
+      else n = SproxySocket + 1;
+      tv.tv_sec = 1;//timeout is 10.5 sec to receive data on either socket
+      tv.tv_usec = 0; //this is .5 sec
+
+      //Begin message sending loop
+      while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
+      {
+        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
+        send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
+
+        if (rv == 0)
         {
-          fprintf(stderr,"I'm listening on telnet\n");
-
-          int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
-          if (newtelnetsocket < 0)
+          hbcount++;
+          //heartbeat hits 3 so we assume the connection timed out and we close
+          if (hbcount == 3)
           {
-            error("ERROR on telnet accept");
+            fprintf(stderr,"hb hit three, reset\n");
+            hbcount = 0;//reset hb count
+            //close(SproxySocket);//close disconnected socket
+
+            //int SproxySocket = SproxyConnect(argv[2],sproxyport);
+
+            //if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
+            //{
+            //  error("ERROR connecting NEW sproxy\n");
+            //}
+            //fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
           }
-          fprintf(stderr,"Connected to telnet local host\n");
+        }
 
-          //connect to sproxy
-          if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
-          {
-            error("ERROR connecting to sproxy");
-          }
-          fprintf(stderr,"Connected to sproxy\n");
-
-          FD_ZERO(&readfds);// clear the set
-          FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
-          FD_SET(SproxySocket, &readfds);
-          if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
-          else n = SproxySocket + 1;
-          tv.tv_sec = 10;//timeout is 10.5 sec to receive data on either socket
-          tv.tv_usec = 500000; //this is .5 sec
-
-          //Begin message sending loop
-          //while(1)
-          while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
-          {
-            //FD_ZERO(&readfds);// clear the set
-            //FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
-            //FD_SET(SproxySocket, &readfds);
-            //if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
-            //else n = SproxySocket + 1;
-            //tv.tv_sec = 10;//timeout is 10.5 sec to receive data on either socket
-            //tv.tv_usec = 500000; //this is .5 sec
-
-            //rv = select(n, &readfds, NULL, NULL, &tv);//Engage select function, will return when at least one socket has traffic or timeout.
-
-            if (rv == -1)
+        else
+        {
+            // one or both of the descriptors have data
+            if (FD_ISSET(newtelnetsocket, &readfds))
             {
-                error("ERROR engaging select function on client");
-            }
-
-            else if (rv == 0)
-            {
-                printf("No data given before timeout window\n");
-            }
-            else
-            {
-                // one or both of the descriptors have data
-                if (FD_ISSET(newtelnetsocket, &readfds))
+                len = recv(newtelnetsocket, buf1, sizeof(buf1), 0);
+                if (len <= 0)
                 {
-                    len = recv(newtelnetsocket, buf1, sizeof(buf1), 0);
-                    if (len <= 0)
-                    {
-                        break;
-                    }
-                    send(SproxySocket, buf1, len, 0);
+                    break;
                 }
+                send(SproxySocket, buf1, len, 0);
+            }
 
-                if (FD_ISSET(SproxySocket, &readfds))
+            if (FD_ISSET(SproxySocket, &readfds))
+            {
+                len = recv(SproxySocket, buf2, sizeof(buf2), 0);
+                if (len <= 0)
                 {
-                    len = recv(SproxySocket, buf2, sizeof(buf2), 0);
-                    if (len <= 0)
-                    {
-                        break;
-                    }
-                    send(newtelnetsocket, buf2, len, 0);
+                    break;
                 }
+                send(newtelnetsocket, buf2, len, 0);
             }
-            FD_ZERO(&readfds);// clear the set
-            FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
-            FD_SET(SproxySocket, &readfds);
-            if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
-            else n = SproxySocket + 1;
-            tv.tv_sec = 10;//timeout is 10.5 sec to receive data on either socket
-            tv.tv_usec = 500000; //this is .5 sec
-          }
-              close(SproxySocket,2);
-              close(newtelnetsocket,2);
-            }
-    return 0;
+        }
+        FD_ZERO(&readfds);// clear the set
+        FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
+        FD_SET(SproxySocket, &readfds);
+        if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
+        else n = SproxySocket + 1;
+        tv.tv_sec = 1;//timeout is 10.5 sec to receive data on either socket
+        tv.tv_usec = 0; //this is .5 sec
+      }
+      close(SproxySocket,2);
+      close(newtelnetsocket,2);
+  }
+  return 0;
 }

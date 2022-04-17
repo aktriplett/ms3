@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
   int n, len = 0;
   int cproxyrecv, daemonrecv = 0;
   int seqNum = 0;
+  int hbcount = 0;
   char buf1[BUFFERSIZE],buf2[BUFFERSIZE];
 
   if (argc < 1)// have all necessary command line arguments been given
@@ -131,52 +132,63 @@ int main(int argc, char *argv[])
     FD_SET(DaemonSocket, &readfds);
     if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
     else n = DaemonSocket + 1;
-    tv.tv_sec = 10;// timeout is 10.5 sec to receive data on either socket
-    tv.tv_usec = 500000; //this is .5 sec
+    tv.tv_sec = 1;// timeout is 10.5 sec to receive data on either socket
+    tv.tv_usec = 0; //this is .5 sec
 
     //Entering the message loop
-    //while(1)
     while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
     {
-        //rv = select(n, &readfds, NULL, NULL, &tv);
-        if (rv == -1)
-        {
-           error("ERROR engaging select function on server");
-        }
+      setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
+      send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
 
-        else if (rv == 0)
+      if (rv == 0)
+      {
+        hbcount++;
+        if (hbcount == 3)
         {
-             printf("No data given before timeout window.\n");
-        }
-        else
-        {
-             // one or both of the descriptors have data
-             if (FD_ISSET(newcproxysocket, &readfds))
-             {
-                 len = recv(newcproxysocket, buf1, sizeof(buf1), 0);
-                 if (len <= 0)
-                 {
-                    break;
-                 }
-                 send(DaemonSocket, buf1, len, 0);
-             }
-             if (FD_ISSET(DaemonSocket, &readfds))
-             {
-                 len = recv(DaemonSocket, buf2, sizeof(buf2), 0);
-                 if (len <= 0)
-                 {
-                    break;
-                 }
-                 send(newcproxysocket, buf2, len, 0);
-             }
+            hbcount = 0;
+            fprintf(stderr,"hb hit three, reset\n");
+            // close(newcproxysocket);
+            // int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
+            //
+            // if (newcproxysocket < 0)
+            // {
+            //   error("ERROR on NEW cproxy accept");
+            // }
+            //
+            // FD_SET(newcproxysocket, &readfds);
+            // fprintf(stderr,"sproxy reconnected to cproxy\n");
          }
-         FD_ZERO(&readfds);// clear the set ahead of time
-         FD_SET(newcproxysocket, &readfds);// add our descriptors to the set
-         FD_SET(DaemonSocket, &readfds);
-         if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
-         else n = DaemonSocket + 1;
-         tv.tv_sec = 10;// timeout is 10.5 sec to receive data on either socket
-         tv.tv_usec = 500000; //this is .5 sec
+      }
+      else
+      {
+           // one or both of the descriptors have data
+           if (FD_ISSET(newcproxysocket, &readfds))
+           {
+               len = recv(newcproxysocket, buf1, sizeof(buf1), 0);
+               if (len <= 0)
+               {
+                  break;
+               }
+               send(DaemonSocket, buf1, len, 0);
+           }
+           if (FD_ISSET(DaemonSocket, &readfds))
+           {
+               len = recv(DaemonSocket, buf2, sizeof(buf2), 0);
+               if (len <= 0)
+               {
+                  break;
+               }
+               send(newcproxysocket, buf2, len, 0);
+           }
+       }
+       FD_ZERO(&readfds);// clear the set ahead of time
+       FD_SET(newcproxysocket, &readfds);// add our descriptors to the set
+       FD_SET(DaemonSocket, &readfds);
+       if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
+       else n = DaemonSocket + 1;
+       tv.tv_sec = 1;// timeout is 10.5 sec to receive data on either socket
+       tv.tv_usec = 0; //this is .5 sec
      }
      close(DaemonSocket,2);
      close(newcproxysocket,2);
