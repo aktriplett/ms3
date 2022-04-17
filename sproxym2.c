@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
                error("ERROR on cproxy receive\n");
                break;
              }
-             send(DaemonSocket, cproxybufcproxybuf, cproxyrecv, 0);
+             send(DaemonSocket, cproxybuf, cproxyrecv, 0);
          }
          if (FD_ISSET(DaemonSocket, &readfds))
          {
