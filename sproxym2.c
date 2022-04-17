@@ -147,18 +147,19 @@ int main(int argc, char *argv[])
         hbcount++;
         if (hbcount == 3)
         {
+            fprintf(stderr, "reset hb\n");
             hbcount = 0;
-            fprintf(stderr,"hb hit three, reset\n");
-            close(newcproxysocket);
-            int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
-            
-            if (newcproxysocket < 0)
-            {
-              error("ERROR on NEW cproxy accept");
-            }
-
-            FD_SET(newcproxysocket, &readfds);
-            fprintf(stderr,"sproxy reconnected to cproxy\n");
+            //fprintf(stderr,"hb hit three, reset\n");
+            // close(newcproxysocket);
+            // int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
+            //
+            // if (newcproxysocket < 0)
+            // {
+            //   error("ERROR on NEW cproxy accept");
+            // }
+            //
+            // FD_SET(newcproxysocket, &readfds);
+            // fprintf(stderr,"sproxy reconnected to cproxy\n");
          }
       }
       else
@@ -174,6 +175,7 @@ int main(int argc, char *argv[])
                error("ERROR on cproxy receive\n");
                break;
              }
+             fprintf(stderr, "Received message from cproxy\n");
              send(DaemonSocket, buf1, len, 0);
          }
          if (FD_ISSET(DaemonSocket, &readfds))
@@ -184,6 +186,7 @@ int main(int argc, char *argv[])
                error("ERROR on daemon receive\n");
                break;
              }
+             fprintf(stderr, "Received message from daemon\n");
              send(newcproxysocket, buf2, len, 0);
          }
        }
