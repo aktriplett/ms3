@@ -113,31 +113,31 @@ int main(int argc, char *argv[])
 
     listen(TelnetSocket, 5);
 
-    while(1)
+    //while(1)
+    //{
+    fprintf(stderr,"I'm listening on telnet\n");
+
+    int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
+    if (newtelnetsocket < 0)
     {
-      fprintf(stderr,"I'm listening on telnet\n");
+      error("ERROR on telnet accept");
+    }
+    fprintf(stderr,"Connected to telnet local host\n");
 
-      int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
-      if (newtelnetsocket < 0)
-      {
-        error("ERROR on telnet accept");
-      }
-      fprintf(stderr,"Connected to telnet local host\n");
+    //connect to sproxy
+    if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
+    {
+      error("ERROR connecting to sproxy");
+    }
+    fprintf(stderr,"Connected to sproxy\n");
 
-      //connect to sproxy
-      if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
-      {
-        error("ERROR connecting to sproxy");
-      }
-      fprintf(stderr,"Connected to sproxy\n");
-
-      FD_ZERO(&readfds);// clear the set
-      FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
-      FD_SET(SproxySocket, &readfds);
-      if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
-      else n = SproxySocket + 1;
-      tv.tv_sec = 10;//timeout is 10.5 sec to receive data on either socket
-      tv.tv_usec = 0; //this is .5 sec
+    FD_ZERO(&readfds);// clear the set
+    FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
+    FD_SET(SproxySocket, &readfds);
+    if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
+    else n = SproxySocket + 1;
+    tv.tv_sec = 10;//timeout is 10.5 sec to receive data on either socket
+    tv.tv_usec = 0; //this is .5 sec
 
       //Begin message sending loop
       while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
@@ -229,6 +229,6 @@ int main(int argc, char *argv[])
       close(SproxySocket,2);
       close(newtelnetsocket,2);
       break;
-  }
+  //}
   return 0;
 }

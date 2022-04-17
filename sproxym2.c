@@ -110,113 +110,113 @@ int main(int argc, char *argv[])
 
   listen(CproxySocket, 5);//going into listen mode on sproxy, can handle 5 clients
 
-  while(1)
+  //while(1)
+  //{
+  fprintf(stderr,"I'm listening on cproxy socket\n");
+  int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
+  if (newcproxysocket < 0)
   {
-    fprintf(stderr,"I'm listening on cproxy socket\n");
-    int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
-    if (newcproxysocket < 0)
-    {
-      error("ERROR on cproxy accept");
-    }
-    fprintf(stderr,"Connected to a client on cproxy\n");
-
-    //connect to telnet daemon
-    if (connect(DaemonSocket, &daemon_addr, sizeof(daemon_addr)) < 0)
-    {
-      error("ERROR connecting to daemon");
-    }
-    fprintf(stderr,"Connected to telnet daemon\n");
-
-    FD_ZERO(&readfds);// clear the set ahead of time
-    FD_SET(newcproxysocket, &readfds);// add our descriptors to the set
-    FD_SET(DaemonSocket, &readfds);
-    if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
-    else n = DaemonSocket + 1;
-    tv.tv_sec = 10;// timeout is 10.5 sec to receive data on either socket
-    tv.tv_usec = 0; //this is .5 sec
-
-    //Entering the message loop
-    while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
-    {
-      setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
-      fprintf(stderr, "set the hb packet\n");
-      //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
-
-      if (rv == 0)
-      {
-        hbcount++;
-        if (hbcount == 3)
-        {
-            fprintf(stderr, "reset hb\n");
-            hbcount = 0;
-            //fprintf(stderr,"hb hit three, reset\n");
-            // close(newcproxysocket);
-            // int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
-            //
-            // if (newcproxysocket < 0)
-            // {
-            //   error("ERROR on NEW cproxy accept");
-            // }
-            //
-            // FD_SET(newcproxysocket, &readfds);
-            // fprintf(stderr,"sproxy reconnected to cproxy\n");
-         }
-      }
-      else
-      {
-         bzero(buf1, sizeof(buf1));
-         bzero(buf2, sizeof(buf2));
-         // one or both of the descriptors have data
-         if (FD_ISSET(newcproxysocket, &readfds))
-         {
-             len = recv(newcproxysocket, buf1, sizeof(buf1), 0);
-             if (len < 0)
-             {
-               error("ERROR on cproxy receive\n");
-               break;
-             }
-             else if (getPacketType(buf1) == 2)
-             {
-                 fprintf(stderr,"normal message received\n");
-                 send(DaemonSocket, getPacketMsg(buf1), len - 12, 0);//forward the message from cproxy to the telnet daemon
-                 len = 0;
-             }
-             else if (getPacketType(buf1) == 1)
-             {
-                 fprintf(stderr,"heartbeat message received, resetting hbcount\n");
-                 hbcount = 0;
-                 len = 0;
-             }
-
-             else
-             {
-               fprintf(stderr, "Inside cproxy buffer\n");
-               len = 0;
-             }
-         }
-         if (FD_ISSET(DaemonSocket, &readfds))
-         {
-             len = recv(DaemonSocket, buf2, sizeof(buf2), 0);
-             if (len < 0)
-             {
-               error("ERROR on daemon receive\n");
-               break;
-             }
-             setPacket(2, daemonbuf, len, seqNum); //not a heartbeat, other message
-             send(newcproxysocket, buf2, len, 0);
-             len = 0;
-         }
-       }
-       FD_ZERO(&readfds);// clear the set ahead of time
-       FD_SET(newcproxysocket, &readfds);// add our descriptors to the set
-       FD_SET(DaemonSocket, &readfds);
-       if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
-       else n = DaemonSocket + 1;
-       tv.tv_sec = 10;// timeout is 10.5 sec to receive data on either socket
-       tv.tv_usec = 0; //this is .5 sec
-     }
-     close(DaemonSocket,2);
-     close(newcproxysocket,2);
+    error("ERROR on cproxy accept");
   }
+  fprintf(stderr,"Connected to a client on cproxy\n");
+
+  //connect to telnet daemon
+  if (connect(DaemonSocket, &daemon_addr, sizeof(daemon_addr)) < 0)
+  {
+    error("ERROR connecting to daemon");
+  }
+  fprintf(stderr,"Connected to telnet daemon\n");
+
+  FD_ZERO(&readfds);// clear the set ahead of time
+  FD_SET(newcproxysocket, &readfds);// add our descriptors to the set
+  FD_SET(DaemonSocket, &readfds);
+  if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
+  else n = DaemonSocket + 1;
+  tv.tv_sec = 10;// timeout is 10.5 sec to receive data on either socket
+  tv.tv_usec = 0; //this is .5 sec
+
+  //Entering the message loop
+  while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
+  {
+    setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
+    fprintf(stderr, "set the hb packet\n");
+    //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
+
+    if (rv == 0)
+    {
+      hbcount++;
+      if (hbcount == 3)
+      {
+          fprintf(stderr, "reset hb\n");
+          hbcount = 0;
+          //fprintf(stderr,"hb hit three, reset\n");
+          // close(newcproxysocket);
+          // int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
+          //
+          // if (newcproxysocket < 0)
+          // {
+          //   error("ERROR on NEW cproxy accept");
+          // }
+          //
+          // FD_SET(newcproxysocket, &readfds);
+          // fprintf(stderr,"sproxy reconnected to cproxy\n");
+       }
+    }
+    else
+    {
+       bzero(buf1, sizeof(buf1));
+       bzero(buf2, sizeof(buf2));
+       // one or both of the descriptors have data
+       if (FD_ISSET(newcproxysocket, &readfds))
+       {
+           len = recv(newcproxysocket, buf1, sizeof(buf1), 0);
+           if (len < 0)
+           {
+             error("ERROR on cproxy receive\n");
+             break;
+           }
+           else if (getPacketType(buf1) == 2)
+           {
+               fprintf(stderr,"normal message received\n");
+               send(DaemonSocket, getPacketMsg(buf1), len - 12, 0);//forward the message from cproxy to the telnet daemon
+               len = 0;
+           }
+           else if (getPacketType(buf1) == 1)
+           {
+               fprintf(stderr,"heartbeat message received, resetting hbcount\n");
+               hbcount = 0;
+               len = 0;
+           }
+
+           else
+           {
+             fprintf(stderr, "Inside cproxy buffer\n");
+             len = 0;
+           }
+       }
+       if (FD_ISSET(DaemonSocket, &readfds))
+       {
+           len = recv(DaemonSocket, buf2, sizeof(buf2), 0);
+           if (len < 0)
+           {
+             error("ERROR on daemon receive\n");
+             break;
+           }
+           setPacket(2, daemonbuf, len, seqNum); //not a heartbeat, other message
+           send(newcproxysocket, buf2, len, 0);
+           len = 0;
+       }
+     }
+     FD_ZERO(&readfds);// clear the set ahead of time
+     FD_SET(newcproxysocket, &readfds);// add our descriptors to the set
+     FD_SET(DaemonSocket, &readfds);
+     if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
+     else n = DaemonSocket + 1;
+     tv.tv_sec = 10;// timeout is 10.5 sec to receive data on either socket
+     tv.tv_usec = 0; //this is .5 sec
+   }
+   close(DaemonSocket,2);
+   close(newcproxysocket,2);
+  //}
   return 0;
 }
