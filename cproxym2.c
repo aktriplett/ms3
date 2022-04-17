@@ -143,8 +143,9 @@ int main(int argc, char *argv[])
       while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
       {
         setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
-        send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
-
+        fprintf(stderr, "set the hb packet\n");
+        //send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
+        //fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
         if (rv == 0)
         {
           hbcount++;
@@ -153,6 +154,7 @@ int main(int argc, char *argv[])
           {
             //fprintf(stderr,"hb hit three, reset\n");
             hbcount = 0;//reset hb count
+            fprintf(stderr, "reset hb\n");
             //close(SproxySocket);//close disconnected socket
 
             //int SproxySocket = SproxyConnect(argv[2],sproxyport);
@@ -167,26 +169,32 @@ int main(int argc, char *argv[])
 
         else
         {
-            // one or both of the descriptors have data
-            if (FD_ISSET(newtelnetsocket, &readfds))
-            {
-                len = recv(newtelnetsocket, buf1, sizeof(buf1), 0);
-                if (len <= 0)
-                {
-                    break;
-                }
-                send(SproxySocket, buf1, len, 0);
-            }
+          bzero(buf1, sizeof(buf1));
+          bzero(buf2, sizeof(buf2));
+          // one or both of the descriptors have data
+          if (FD_ISSET(newtelnetsocket, &readfds))
+          {
+              len = recv(newtelnetsocket, buf1, sizeof(buf1), 0);
+              if (len < 0)
+              {
+                error("ERROR on telnet receive\n");
+                break;
+              }
+              fprintf(stderr, "Received message from telnet\n");
+              send(SproxySocket, buf1, len, 0);
+          }
 
-            if (FD_ISSET(SproxySocket, &readfds))
-            {
-                len = recv(SproxySocket, buf2, sizeof(buf2), 0);
-                if (len <= 0)
-                {
-                    break;
-                }
-                send(newtelnetsocket, buf2, len, 0);
-            }
+          if (FD_ISSET(SproxySocket, &readfds))
+          {
+              len = recv(SproxySocket, buf2, sizeof(buf2), 0);
+              if (len < 0)
+              {
+                error("ERROR on sproxy receive\n");
+                break;
+              }
+              fprintf(stderr, "Received message from sproxy\n");
+              send(newtelnetsocket, buf2, len, 0);
+          }
         }
         FD_ZERO(&readfds);// clear the set
         FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
@@ -198,6 +206,7 @@ int main(int argc, char *argv[])
       }
       close(SproxySocket,2);
       close(newtelnetsocket,2);
+      break;
   }
   return 0;
 }

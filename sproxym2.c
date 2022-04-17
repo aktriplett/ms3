@@ -139,13 +139,15 @@ int main(int argc, char *argv[])
     while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
     {
       setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
-      send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
+      fprintf(stderr, "set the hb packet\n");
+      //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
 
       if (rv == 0)
       {
         hbcount++;
         if (hbcount == 3)
         {
+            fprintf(stderr, "reset hb\n");
             hbcount = 0;
             //fprintf(stderr,"hb hit three, reset\n");
             // close(newcproxysocket);
@@ -162,25 +164,31 @@ int main(int argc, char *argv[])
       }
       else
       {
-           // one or both of the descriptors have data
-           if (FD_ISSET(newcproxysocket, &readfds))
-           {
-               len = recv(newcproxysocket, buf1, sizeof(buf1), 0);
-               if (len <= 0)
-               {
-                  break;
-               }
-               send(DaemonSocket, buf1, len, 0);
-           }
-           if (FD_ISSET(DaemonSocket, &readfds))
-           {
-               len = recv(DaemonSocket, buf2, sizeof(buf2), 0);
-               if (len <= 0)
-               {
-                  break;
-               }
-               send(newcproxysocket, buf2, len, 0);
-           }
+         bzero(buf1, sizeof(buf1));
+         bzero(buf2, sizeof(buf2));
+         // one or both of the descriptors have data
+         if (FD_ISSET(newcproxysocket, &readfds))
+         {
+             len = recv(newcproxysocket, buf1, sizeof(buf1), 0);
+             if (len < 0)
+             {
+               error("ERROR on cproxy receive\n");
+               break;
+             }
+             fprintf(stderr, "Received message from cproxy\n");
+             send(DaemonSocket, buf1, len, 0);
+         }
+         if (FD_ISSET(DaemonSocket, &readfds))
+         {
+             len = recv(DaemonSocket, buf2, sizeof(buf2), 0);
+             if (len < 0)
+             {
+               error("ERROR on daemon receive\n");
+               break;
+             }
+             fprintf(stderr, "Received message from daemon\n");
+             send(newcproxysocket, buf2, len, 0);
+         }
        }
        FD_ZERO(&readfds);// clear the set ahead of time
        FD_SET(newcproxysocket, &readfds);// add our descriptors to the set
