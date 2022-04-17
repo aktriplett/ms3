@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
     struct timeval tv;
     int rv;
     int n, len = 0;
+    int hbcount = 0;
     int telnetrecv, sproxyrecv = 0;
     char buf1[BUFFERSIZE],buf2[BUFFERSIZE];
 
