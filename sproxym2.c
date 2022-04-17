@@ -86,48 +86,32 @@ char* getPacketMsg(char* packet)
 
 int main(int argc, char *argv[])
 {
-  //set vars for creating sockets
   int DaemonSocket, CproxySocket;
   int cproxyport;
   socklen_t len1;
-  //set vars for select
   fd_set readfds;
   struct timeval tv;
-  //vars for receiving and sending messages
   int rv;
   int n, len = 0;
+  int cproxyrecv, daemonrecv = 0;
+  int seqNum = 0;
   char buf1[BUFFERSIZE],buf2[BUFFERSIZE];
 
-  // have all necessary command line arguments been given
-  if (argc < 1)
+  if (argc < 1)// have all necessary command line arguments been given
   {
     fprintf(stderr, "ERROR, no port provided\n");
     exit(1);
   }
 
-  //port no passed in command line arg, to convert character to int we use atoi
-  cproxyport = atoi(argv[1]);
-
-  //calling socket set up functions
-  DaemonSocket = DaemonConnect();
+  cproxyport = atoi(argv[1]);//port no passed in command line arg, to convert character to int we use atoi
+  DaemonSocket = DaemonConnect();//calling socket set up functions
   CproxySocket = CproxyConnect(cproxyport);
 
-  //going into listen mode on sproxy, can handle 5 clients
-  //fprintf(stderr,"I'm listening\n");
-  listen(CproxySocket, 5);
+  listen(CproxySocket, 5);//going into listen mode on sproxy, can handle 5 clients
+
   while(1)
   {
-    fprintf(stderr,"I'm listening\n");
-    //calling socket set up functions
-    //DaemonSocket = DaemonConnect();
-    //CproxySocket = CproxyConnect(cproxyport);
-
-    //going into listen mode on sproxy, can handle 5 clients
-    //fprintf(stderr,"I'm listening\n");
-    //listen(CproxySocket, 5);
-
-    //creating new socket for particular client that has my address and client address
-    //cproxy_addr provides all the info i need about the client
+    fprintf(stderr,"I'm listening on cproxy socket\n");
     int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
 
     if (newcproxysocket < 0)

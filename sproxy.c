@@ -103,16 +103,17 @@ int main(int argc, char *argv[])
   }
 
   //set vars for creating sockets
-  int DaemonSocket, CproxySocket;
-  int cproxyport;
+  //int DaemonSocket, CproxySocket;
+  //int cproxyport;
   //set vars for select
-  fd_set readfds;
-  struct timeval tv;
-  socklen_t len1;
+  //fd_set readfds;
+  //struct timeval tv;
+  //socklen_t len1;
   //vars for receiving and sending messages
-  int rv;
-  int n, cproxyrecv, daemonrecv = 0;
-  int seqNum = 0;
+  //int rv;
+  //int n;
+  //int cproxyrecv, daemonrecv = 0;
+  //int seqNum = 0;
 
   //port no passed in command line arg, to convert character to int we use atoi
   cproxyport = atoi(argv[1]);
