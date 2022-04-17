@@ -113,7 +113,6 @@ int main(int argc, char *argv[])
   {
     fprintf(stderr,"I'm listening on cproxy socket\n");
     int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
-
     if (newcproxysocket < 0)
     {
       error("ERROR on cproxy accept");
@@ -127,32 +126,19 @@ int main(int argc, char *argv[])
     }
     fprintf(stderr,"Connected to telnet daemon\n");
 
-    ////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////
+    FD_ZERO(&readfds);// clear the set ahead of time
+    FD_SET(newcproxysocket, &readfds);// add our descriptors to the set
+    FD_SET(DaemonSocket, &readfds);
+    if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
+    else n = DaemonSocket + 1;
+    tv.tv_sec = 10;// timeout is 10.5 sec to receive data on either socket
+    tv.tv_usec = 500000; //this is .5 sec
+
     //Entering the message loop
-    while(1)
+    //while(1)
+    while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
     {
-        // clear the set ahead of time
-        FD_ZERO(&readfds);
-
-        // add our descriptors to the set
-        FD_SET(newcproxysocket, &readfds);
-        FD_SET(DaemonSocket, &readfds);
-
-
-        // find the largest descriptor, and plus one.
-        if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;
-        else n = DaemonSocket + 1;
-
-        // timeout is 10.5 sec to receive data on either socket
-        tv.tv_sec = 10;
-        tv.tv_usec = 500000; //this is .5 sec
-
-        //Engage select function, will return when at least one socket
-        //has traffic or timeout.
-        rv = select(n, &readfds, NULL, NULL, &tv);
-
+        //rv = select(n, &readfds, NULL, NULL, &tv);
         if (rv == -1)
         {
            error("ERROR engaging select function on server");
@@ -184,6 +170,13 @@ int main(int argc, char *argv[])
                  send(newcproxysocket, buf2, len, 0);
              }
          }
+         FD_ZERO(&readfds);// clear the set ahead of time
+         FD_SET(newcproxysocket, &readfds);// add our descriptors to the set
+         FD_SET(DaemonSocket, &readfds);
+         if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
+         else n = DaemonSocket + 1;
+         tv.tv_sec = 10;// timeout is 10.5 sec to receive data on either socket
+         tv.tv_usec = 500000; //this is .5 sec
      }
      close(DaemonSocket,2);
      close(newcproxysocket,2);
