@@ -169,29 +169,29 @@ int main(int argc, char *argv[])
 
         else
         {
-          bzero(telnetbuf, sizeof(telnetbuf));
-          bzero(sproxybuf, sizeof(sproxybuf));
+          bzero(buf1, sizeof(buf1));
+          bzero(buf2, sizeof(buf2));
           // one or both of the descriptors have data
           if (FD_ISSET(newtelnetsocket, &readfds))
           {
-              telnetrecv = recv(newtelnetsocket, telnetbuf, sizeof(telnetbuf), 0);
-              if (telnetrecv < 0)
+              len = recv(newtelnetsocket, buf1, sizeof(buf1), 0);
+              if (len < 0)
               {
                 error("ERROR on telnet receive\n");
                 break;
               }
-              send(SproxySocket, telnetbuf, telnetrecv, 0);
+              send(SproxySocket, buf1, len, 0);
           }
 
           if (FD_ISSET(SproxySocket, &readfds))
           {
-              sproxyrecv  = recv(SproxySocket, sproxybuf, sizeof(sproxybuf), 0);
-              if (sproxyrecv  < 0)
+              len = recv(SproxySocket, buf2, sizeof(buf2), 0);
+              if (len < 0)
               {
                 error("ERROR on sproxy receive\n");
                 break;
               }
-              send(newtelnetsocket, sproxybuf, sproxyrecv , 0);
+              send(newtelnetsocket, buf2, len, 0);
           }
         }
         FD_ZERO(&readfds);// clear the set
