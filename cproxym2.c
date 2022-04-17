@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
       }
       close(SproxySocket,2);
       close(newtelnetsocket,2);
-      break;
+      //break;
   //}
   return 0;
 }
