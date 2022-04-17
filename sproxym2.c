@@ -175,23 +175,24 @@ int main(int argc, char *argv[])
              error("ERROR on cproxy receive\n");
              break;
            }
-           else if (getPacketType(buf1) == 2)
-           {
-               fprintf(stderr,"normal message received\n");
-               send(DaemonSocket, getPacketMsg(buf1), len - 12, 0);//forward the message from cproxy to the telnet daemon
-               len = 0;
-           }
-           else if (getPacketType(buf1) == 1)
-           {
-               fprintf(stderr,"heartbeat message received, resetting hbcount\n");
-               hbcount = 0;
-               len = 0;
-           }
+           //else if (getPacketType(buf1) == 2)
+           // {
+           //     fprintf(stderr,"normal message received\n");
+           //     send(DaemonSocket, getPacketMsg(buf1), len - 12, 0);//forward the message from cproxy to the telnet daemon
+           //     len = 0;
+           // }
+           // else if (getPacketType(buf1) == 1)
+           // {
+           //     fprintf(stderr,"heartbeat message received, resetting hbcount\n");
+           //     hbcount = 0;
+           //     len = 0;
+           // }
 
-           else
+          else
            {
-             fprintf(stderr, "Inside cproxy buffer\n");
-             len = 0;
+             send(DaemonSocket, buf1, len, 0);
+             //fprintf(stderr, "Inside cproxy buffer\n");
+             //len = 0;
            }
        }
        if (FD_ISSET(DaemonSocket, &readfds))
@@ -202,9 +203,13 @@ int main(int argc, char *argv[])
              error("ERROR on daemon receive\n");
              break;
            }
-           setPacket(2, daemonbuf, len, seqNum); //not a heartbeat, other message
-           send(newcproxysocket, buf2, len, 0);
-           len = 0;
+           else
+           {
+             send(newcproxysocket, buf2, len, 0);
+           }
+           //setPacket(2, daemonbuf, len, seqNum); //not a heartbeat, other message
+           //send(newcproxysocket, buf2, len, 0);
+           //len = 0;
        }
      }
      FD_ZERO(&readfds);// clear the set ahead of time

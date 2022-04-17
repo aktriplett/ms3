@@ -139,95 +139,96 @@ int main(int argc, char *argv[])
     tv.tv_sec = 10;//timeout is 10.5 sec to receive data on either socket
     tv.tv_usec = 0; //this is .5 sec
 
-      //Begin message sending loop
-      while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
+    //Begin message sending loop
+    while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
+    {
+      setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
+      fprintf(stderr, "set the hb packet\n");
+      //send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
+      //fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
+      if (rv == 0)
       {
-        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
-        fprintf(stderr, "set the hb packet\n");
-        //send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
-        //fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
-        if (rv == 0)
+        hbcount++;
+        //heartbeat hits 3 so we assume the connection timed out and we close
+        if (hbcount == 3)
         {
-          hbcount++;
-          //heartbeat hits 3 so we assume the connection timed out and we close
-          if (hbcount == 3)
-          {
-            //fprintf(stderr,"hb hit three, reset\n");
-            hbcount = 0;//reset hb count
-            fprintf(stderr, "reset hb\n");
-            //close(SproxySocket);//close disconnected socket
+          //fprintf(stderr,"hb hit three, reset\n");
+          hbcount = 0;//reset hb count
+          fprintf(stderr, "reset hb\n");
+          //close(SproxySocket);//close disconnected socket
 
-            //int SproxySocket = SproxyConnect(argv[2],sproxyport);
+          //int SproxySocket = SproxyConnect(argv[2],sproxyport);
 
-            //if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
-            //{
-            //  error("ERROR connecting NEW sproxy\n");
-            //}
-            //fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
-          }
+          //if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
+          //{
+          //  error("ERROR connecting NEW sproxy\n");
+          //}
+          //fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
         }
-
-        else
-        {
-          bzero(buf1, sizeof(buf1));
-          bzero(buf2, sizeof(buf2));
-          // one or both of the descriptors have data
-          if (FD_ISSET(newtelnetsocket, &readfds))
-          {
-              len = recv(newtelnetsocket, buf1, sizeof(buf1), 0);
-              if (len < 0)
-              {
-                error("ERROR on telnet receive\n");
-                break;
-              }
-              else
-              {
-                setPacket(2, buf1, len, 1);
-                send(SproxySocket, buf1, len, 0);
-                len = 0;
-              }
-          }
-
-          if (FD_ISSET(SproxySocket, &readfds))
-          {
-              len = recv(SproxySocket, buf2, sizeof(buf2), 0);
-              if (len < 0)
-              {
-                error("ERROR on sproxy receive\n");
-                break;
-              }
-              else
-              {
-                if (getPacketType(buf2) == 2)//we are forwarding the sproxy message to telnet
-                {
-                    fprintf(stderr, "Got a ping\n");
-                    send(newtelnetsocket, getPacketMsg(buf2), len - 12, 0);
-                    len = 0;
-                }
-                else if (getPacketType(buf2) == 1)//we received a heartbeat from sproxy and  will reset the hbcount
-                {
-                    fprintf(stderr, "Got a heartbeat\n");
-                    hbcount = 0;
-                    len = 0;
-                }
-                else
-                {
-                  fprintf(stderr, "Inside sproxy buffer\n");
-                  len = 0;
-                }
-              }
-          }
-        }
-        FD_ZERO(&readfds);// clear the set
-        FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
-        FD_SET(SproxySocket, &readfds);
-        if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
-        else n = SproxySocket + 1;
-        tv.tv_sec = 10;//timeout is 10.5 sec to receive data on either socket
-        tv.tv_usec = 0; //this is .5 sec
       }
-      close(SproxySocket,2);
-      close(newtelnetsocket,2);
+
+      else
+      {
+        bzero(buf1, sizeof(buf1));
+        bzero(buf2, sizeof(buf2));
+        // one or both of the descriptors have data
+        if (FD_ISSET(newtelnetsocket, &readfds))
+        {
+            len = recv(newtelnetsocket, buf1, sizeof(buf1), 0);
+            if (len < 0)
+            {
+              error("ERROR on telnet receive\n");
+              break;
+            }
+            else
+            {
+              //setPacket(2, buf1, len, 1);
+              send(SproxySocket, buf1, len, 0);
+              //len = 0;
+            }
+        }
+
+        if (FD_ISSET(SproxySocket, &readfds))
+        {
+            len = recv(SproxySocket, buf2, sizeof(buf2), 0);
+            if (len < 0)
+            {
+              error("ERROR on sproxy receive\n");
+              break;
+            }
+            else
+            {
+              send(newtelnetsocket, buf2, len, 0);
+              //if (getPacketType(buf2) == 2)//we are forwarding the sproxy message to telnet
+              //{
+              //     fprintf(stderr, "Got a ping\n");
+              //     send(newtelnetsocket, getPacketMsg(buf2), len - 12, 0);
+              //     len = 0;
+              // }
+              // else if (getPacketType(buf2) == 1)//we received a heartbeat from sproxy and  will reset the hbcount
+              // {
+              //     fprintf(stderr, "Got a heartbeat\n");
+              //     hbcount = 0;
+              //     len = 0;
+              // }
+              // else
+              // {
+              //   fprintf(stderr, "Inside sproxy buffer\n");
+              //   len = 0;
+              // }
+            }
+        }
+      }
+      FD_ZERO(&readfds);// clear the set
+      FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
+      FD_SET(SproxySocket, &readfds);
+      if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
+      else n = SproxySocket + 1;
+      tv.tv_sec = 10;//timeout is 10.5 sec to receive data on either socket
+      tv.tv_usec = 0; //this is .5 sec
+    }
+    close(SproxySocket,2);
+    close(newtelnetsocket,2);
       //break;
   //}
   return 0;
