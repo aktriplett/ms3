@@ -152,18 +152,17 @@ int main(int argc, char *argv[])
           //heartbeat hits 3 so we assume the connection timed out and we close
           if (hbcount == 3)
           {
-            //fprintf(stderr,"hb hit three, reset\n");
+            fprintf(stderr,"hb hit three, reset\n");
             hbcount = 0;//reset hb count
-            fprintf(stderr, "reset hb\n");
-            //close(SproxySocket);//close disconnected socket
+            close(SproxySocket);//close disconnected socket
 
-            //int SproxySocket = SproxyConnect(argv[2],sproxyport);
+            int SproxySocket = SproxyConnect(argv[2],sproxyport);
 
-            //if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
-            //{
-            //  error("ERROR connecting NEW sproxy\n");
-            //}
-            //fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
+            if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
+            {
+             error("ERROR connecting NEW sproxy\n");
+            }
+            fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
           }
         }
 
