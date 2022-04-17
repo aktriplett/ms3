@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     FD_SET(DaemonSocket, &readfds);
     if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
     else n = DaemonSocket + 1;
-    tv.tv_sec = 1;// timeout is 10.5 sec to receive data on either socket
+    tv.tv_sec = 10;// timeout is 10.5 sec to receive data on either socket
     tv.tv_usec = 0; //this is .5 sec
 
     //Entering the message loop
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
         if (hbcount == 3)
         {
             hbcount = 0;
-            fprintf(stderr,"hb hit three, reset\n");
+            //fprintf(stderr,"hb hit three, reset\n");
             // close(newcproxysocket);
             // int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
             //
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
        FD_SET(DaemonSocket, &readfds);
        if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;// find the largest descriptor, and plus one.
        else n = DaemonSocket + 1;
-       tv.tv_sec = 1;// timeout is 10.5 sec to receive data on either socket
+       tv.tv_sec = 10;// timeout is 10.5 sec to receive data on either socket
        tv.tv_usec = 0; //this is .5 sec
      }
      close(DaemonSocket,2);

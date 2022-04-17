@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
       FD_SET(SproxySocket, &readfds);
       if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
       else n = SproxySocket + 1;
-      tv.tv_sec = 1;//timeout is 10.5 sec to receive data on either socket
+      tv.tv_sec = 10;//timeout is 10.5 sec to receive data on either socket
       tv.tv_usec = 0; //this is .5 sec
 
       //Begin message sending loop
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
           //heartbeat hits 3 so we assume the connection timed out and we close
           if (hbcount == 3)
           {
-            fprintf(stderr,"hb hit three, reset\n");
+            //fprintf(stderr,"hb hit three, reset\n");
             hbcount = 0;//reset hb count
             //close(SproxySocket);//close disconnected socket
 
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
         FD_SET(SproxySocket, &readfds);
         if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
         else n = SproxySocket + 1;
-        tv.tv_sec = 1;//timeout is 10.5 sec to receive data on either socket
+        tv.tv_sec = 10;//timeout is 10.5 sec to receive data on either socket
         tv.tv_usec = 0; //this is .5 sec
       }
       close(SproxySocket,2);
