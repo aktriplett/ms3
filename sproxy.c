@@ -5,7 +5,6 @@
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include <ifaddrs.h>
 #define BUFFERSIZE 1024
 
 //method called error, exit(1) means you are exiting from the program

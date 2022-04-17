@@ -16,6 +16,7 @@ void error(char *msg)
 //initialize vars for all functions
 struct sockaddr_in daemon_addr, cproxy_addr;
 char *daemonip = "127.0.0.1";
+char daemonbuf[BUFFERSIZE], cproxybuf[BUFFERSIZE], packetbuf[BUFFERSIZE];
 int option = 1;
 
 int DaemonConnect()
@@ -27,39 +28,30 @@ int DaemonConnect()
   {
     error("ERROR opening Daemon socket");
   }
-  //clearing _addr with bzero method
-  bzero((char *) &daemon_addr, sizeof(daemon_addr));
 
-  //saying to server address, all will be in internet address concept
-  daemon_addr.sin_family = AF_INET;
-  // converting char ip addr
-  inet_aton(daemonip, &daemon_addr.sin_addr.s_addr);
-  // convert integer format to network format with htons
-  daemon_addr.sin_port = htons(23);
+  bzero((char *) &daemon_addr, sizeof(daemon_addr));//clearing _addr with bzero method
+  daemon_addr.sin_family = AF_INET;//saying to server address, all will be in internet address concept
+  inet_aton(daemonip, &daemon_addr.sin_addr.s_addr);// converting char ip addr
+  daemon_addr.sin_port = htons(23);// convert integer format to network format with htons
   fprintf(stderr,"Received and converted Daemon IP\n");
 
   return DaemonSocket;
 }
+
 int CproxyConnect(int portno)
 {
-  // Create socket.
-  int CproxySocket = socket(AF_INET, SOCK_STREAM, 0);
+  int CproxySocket = socket(AF_INET, SOCK_STREAM, 0);// Create socket.
   setsockopt(CproxySocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
   if (CproxySocket < 0)
   {
     error("ERROR opening Cproxy socket");
   }
 
-  //clearing _addr with bzero method
   bzero((char *) &cproxy_addr, sizeof(cproxy_addr));
-  //saying to server address, all will be in internet address concept
   cproxy_addr.sin_family = AF_INET;
-  // get your address on your own when you start the program
   cproxy_addr.sin_addr.s_addr = INADDR_ANY;
-  // convert integer format to network format with htons
   cproxy_addr.sin_port = htons(portno);
 
-  // Bind socket
   if (bind(CproxySocket, (struct sockaddr *) &cproxy_addr, sizeof(cproxy_addr)) < 0)
   {
     error("ERROR on binding Cproxy Socket");
@@ -67,6 +59,31 @@ int CproxyConnect(int portno)
 
   return CproxySocket;
 }
+
+char* setPacket(int type, char* payload, int len, int seq)
+{
+   bzero(packetbuf, sizeof(packetbuf));
+   char *p = packetbuf;
+   *((int*) p) = type;
+   p = p + 4;
+   *((int*) p) = seq;
+   p = p + 4;
+   *((int*) p) = len;
+   p = p + 4;
+   memcpy(p, payload, len);
+   return packetbuf;
+}
+
+int getPacketType(char* packet)
+{
+    return *((int*) packet);
+}
+
+char* getPacketMsg(char* packet)
+{
+    return packet + 12;
+}
+
 int main(int argc, char *argv[])
 {
   //set vars for creating sockets

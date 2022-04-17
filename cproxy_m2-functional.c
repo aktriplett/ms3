@@ -15,30 +15,34 @@ void error(char *msg)
 }
 //initialize vars for all functions
 struct sockaddr_in telnet_addr, sproxy_addr;
-char telnetbuf[BUFFERSIZE], sproxybuf[BUFFERSIZE], packetbuf[BUFFERSIZE];
 int option = 1;
+//struct hostent *server;
 
-//FUNCTIONS
 int TelnetConnect(int portno)
 {
   // Create socket
   int TelnetSocket = socket(AF_INET, SOCK_STREAM, 0);
   setsockopt(TelnetSocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
-
   if (TelnetSocket < 0)
   {
     error("ERROR opening Telnet socket");
   }
+  //clearing telnet_addr with bzero method
+  bzero((char *) &telnet_addr, sizeof(telnet_addr));
 
-  bzero((char *) &telnet_addr, sizeof(telnet_addr));//clearing telnet_addr with bzero method
-  telnet_addr.sin_family = AF_INET;//saying to server address, all will be in internet address concept
-  telnet_addr.sin_addr.s_addr = INADDR_ANY;// get your address on your own when you start the program
-  telnet_addr.sin_port = htons(portno);// convert integer format to network format with htons
+  //saying to server address, all will be in internet address concept
+  telnet_addr.sin_family = AF_INET;
+  // get your address on your own when you start the program
+  telnet_addr.sin_addr.s_addr = INADDR_ANY;
+  // convert integer format to network format with htons
+  telnet_addr.sin_port = htons(portno);
 
+  // Bind socket
   if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
   {
     error("ERROR on binding Telnet Socket");
   }
+
   return TelnetSocket;
 }
 
@@ -54,6 +58,7 @@ int SproxyConnect(char *host, int portno)
   }
 
   bzero((char *) &sproxy_addr, sizeof(sproxy_addr));
+
   sproxy_addr.sin_family = AF_INET;
   inet_aton(host, &sproxy_addr.sin_addr.s_addr);
   sproxy_addr.sin_port = htons(portno);
@@ -61,30 +66,6 @@ int SproxyConnect(char *host, int portno)
   fprintf(stderr,"Received and converted server IP\n");
 
   return SproxySocket;
-}
-
-char* setPacket(int type, char* payload, int len, int seq)
-{
-   bzero(packetbuf, sizeof(packetbuf));
-   char *p = packetbuf; //points to start of packetbuf
-   *((int*) p) = type;//loads raw integer data to start of p pointer
-   p = p + 4; //move pointer by size of int
-   *((int*) p) = seq;
-   p = p + 4;
-   *((int*) p) = len;
-   p = p + 4;
-   memcpy(p, payload, len);
-   return packetbuf;
-}
-
-int getPacketType(char* packet)
-{
-    return *((int*) packet);//starting from initial packet pointer and moving an integer length down is int data
-}
-
-char* getPacketMsg(char* packet)
-{
-    return packet + 12;
 }
 
 int main(int argc, char *argv[])
