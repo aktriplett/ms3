@@ -1,11 +1,11 @@
-all: cproxy sproxy
+all: cproxym2 sproxym2
 
-cproxy: cproxy.c
-	cc cproxy.c -o cproxy
+cproxym2: cproxym2.c
+	cc cproxy2.c -o cproxy2
 
-sproxy: sproxy.c
-	cc sproxy.c -o sproxy
+sproxym2: sproxym2.c
+	cc sproxym2.c -o sproxym2
 
 clean:
-	$(RM) cproxy
-	$(RM) sproxy
+	$(RM) cproxym2
+	$(RM) sproxym2
