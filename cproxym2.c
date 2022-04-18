@@ -109,13 +109,14 @@ int main(int argc, char *argv[])
     telnetport = atoi(argv[1]);//port no passed in command line arg, to convert character to int we use atoi
     sproxyport = atoi(argv[3]);
     TelnetSocket = TelnetConnect(telnetport);//calling socket set up functions
-    SproxySocket = SproxyConnect(argv[2],sproxyport);
+    //SproxySocket = SproxyConnect(argv[2],sproxyport);
 
     listen(TelnetSocket, 5);
 
-    //while(1)
-    //{
+    while(1)
+    {
     fprintf(stderr,"I'm listening on telnet\n");
+    SproxySocket = SproxyConnect(argv[2],sproxyport);
 
     int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
     if (newtelnetsocket < 0)
@@ -231,6 +232,6 @@ int main(int argc, char *argv[])
     close(SproxySocket,2);
     close(newtelnetsocket,2);
       //break;
-  //}
+  }
   return 0;
 }

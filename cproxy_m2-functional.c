@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 
     //calling socket set up functions
     TelnetSocket = TelnetConnect(telnetport);
-    SproxySocket = SproxyConnect(argv[2],sproxyport);
+    //SproxySocket = SproxyConnect(argv[2],sproxyport);
     //fprintf(stderr,"I'm listening on telnet\n");
     listen(TelnetSocket, 5);
     while(1)
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
           fprintf(stderr,"I'm listening\n");
           //calling socket set up functions
           //TelnetSocket = TelnetConnect(telnetport);
-          //SproxySocket = SproxyConnect(argv[2],sproxyport);
+          SproxySocket = SproxyConnect(argv[2],sproxyport);
 
           //going into listen mode on telnet socket, can handle 5 clients
           //fprintf(stderr,"I'm listening on telnet\n");
