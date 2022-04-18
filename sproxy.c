@@ -121,7 +121,6 @@ int main(int argc, char *argv[])
   CproxySocket = CproxyConnect(cproxyport);
 
   //going into listen mode on sproxy, can handle 5 clients
-  //fprintf(stderr,"I'm listening\n");
   listen(CproxySocket, 5);
   fprintf(stderr,"I'm listening on cproxy\n");
   while(1)
@@ -158,7 +157,7 @@ int main(int argc, char *argv[])
     {
       setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
       send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
-      //fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
+      fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
 
       if (rv == 0)//Timeout occured, no message received so sending heartbeat
       {
@@ -203,7 +202,7 @@ int main(int argc, char *argv[])
               }
               else if (getPacketType(cproxybuf) == 1)
               {
-                  //fprintf(stderr,"heartbeat message received, resetting hbcount: %s\n", cproxybuf);
+                  fprintf(stderr,"heartbeat message received, resetting hbcount: %s\n", cproxybuf);
                   hbcount = 0;
               }
           }
