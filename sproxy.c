@@ -108,7 +108,6 @@ int main(int argc, char *argv[])
   fd_set readfds;
   struct timeval tv;
   socklen_t len1;
-  vars for receiving and sending messages
   int rv;
   int n;
   int cproxyrecv, daemonrecv = 0;
