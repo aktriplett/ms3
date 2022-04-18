@@ -105,7 +105,6 @@ int main(int argc, char *argv[])
   //set vars for creating sockets
   int DaemonSocket, CproxySocket;
   int cproxyport;
-  set vars for select
   fd_set readfds;
   struct timeval tv;
   socklen_t len1;
