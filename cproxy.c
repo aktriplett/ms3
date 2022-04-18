@@ -109,15 +109,14 @@ int main(int argc, char *argv[])
       fprintf(stderr, "usage %s hostname port\n", argv[0]);
       exit(0);
     }
-    //socklen_t len1;
-    //int rv;
-    //int n, len = 0;
-    //int telnetrecv = 0;
-    //int sproxyrecv = 0;
-    //int telnetport = atoi(argv[1]);//port no passed in command line arg, to convert character to int we use atoi
-    //int sproxyport = atoi(argv[3]);
-    //calling socket set up functions
-    //int TelnetSocket = TelnetConnect(telnetport);
+    socklen_t len1;
+    int rv;
+    int n, len = 0;
+    int telnetrecv = 0;
+    int sproxyrecv = 0;
+    int telnetport = atoi(argv[1]);//port no passed in command line arg, to convert character to int we use atoi
+    int sproxyport = atoi(argv[3]);
+    int TelnetSocket = TelnetConnect(telnetport);
     //int SproxySocket = SproxyConnect(argv[2],sproxyport);
 
     listen(TelnetSocket, 5);
@@ -125,6 +124,7 @@ int main(int argc, char *argv[])
 
     while(1)
     {
+      int SproxySocket = SproxyConnect(argv[2],sproxyport);
       int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
       if (newtelnetsocket <0)
       {
