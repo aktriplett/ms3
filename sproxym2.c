@@ -107,11 +107,10 @@ int main(int argc, char *argv[])
   cproxyport = atoi(argv[1]);//port no passed in command line arg, to convert character to int we use atoi
   //DaemonSocket = DaemonConnect();//calling socket set up functions
   CproxySocket = CproxyConnect(cproxyport);
-
   listen(CproxySocket, 5);//going into listen mode on sproxy, can handle 5 clients
 
   while(1)
-  //{
+  {
   fprintf(stderr,"I'm listening on cproxy socket\n");
   DaemonSocket = DaemonConnect();
   int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
