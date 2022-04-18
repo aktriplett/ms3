@@ -140,14 +140,13 @@ int main(int argc, char *argv[])
       fprintf(stderr,"Connected to sproxy\n");
 
       //set vars for select
-      //fd_set readfds;
+      fd_set readfds;
       FD_ZERO(&readfds);// clear the set
       FD_SET(newtelnetsocket, &readfds);// add descriptors (fd) to set
       FD_SET(SproxySocket, &readfds);
-      //n = SproxySocket + 1;
       if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
       else n = SproxySocket + 1;
-      //struct timeval tv;
+      struct timeval tv;
       tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
       tv.tv_usec = 0;
       int hbcount = 0;
