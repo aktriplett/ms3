@@ -125,7 +125,6 @@ int main(int argc, char *argv[])
   fprintf(stderr,"I'm listening on cproxy\n");
   while(1)
   {
-    DaemonSocket = DaemonConnect();
     int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
     if (newcproxysocket < 0)
     {
@@ -134,6 +133,7 @@ int main(int argc, char *argv[])
     fprintf(stderr,"Connected to a client on cproxy\n");
 
     //connect to telnet daemon
+    DaemonSocket = DaemonConnect();
     if (connect(DaemonSocket, &daemon_addr, sizeof(daemon_addr)) < 0)
     {
       error("ERROR connecting to daemon");
@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
               }
               fprintf(stderr,"sproxy received a message from daemon: %s\n", daemonbuf);
               setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
-              //seqNum++;
+              seqNum++;
               send(newcproxysocket, daemonbuf, daemonrecv, 0);//forward message from daemon to cproxy
               daemonrecv = 0;
           }
