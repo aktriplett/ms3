@@ -17,7 +17,6 @@ void error(char *msg)
 //initialize vars
 struct sockaddr_in telnet_addr, sproxy_addr;
 char telnetbuf[BUFFERSIZE], sproxybuf[BUFFERSIZE], packetbuf[BUFFERSIZE];
-int option = 1;
 
 //FUNCTIONS
 //telnet connect function
@@ -25,7 +24,6 @@ int TelnetConnect(int portno)
 {
   // Create socket
   int TelnetSocket = socket(AF_INET, SOCK_STREAM, 0);
-  setsockopt(TelnetSocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
   if (TelnetSocket < 0)
   {
     error("ERROR opening Telnet socket");
@@ -54,7 +52,6 @@ int SproxyConnect(char *host, int portno)
 {
   // Create socket
   int SproxySocket = socket(AF_INET, SOCK_STREAM, 0);
-  setsockopt(SproxySocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
   if (SproxySocket < 0)
   {
@@ -124,7 +121,6 @@ int main(int argc, char *argv[])
 
     while(1)
     {
-      int SproxySocket = SproxyConnect(argv[2],sproxyport);
       int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
       if (newtelnetsocket <0)
       {
@@ -133,6 +129,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"Connected to telnet local host\n");
 
       //connect to sproxy
+      int SproxySocket = SproxyConnect(argv[2],sproxyport);
       if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
       {
         error("ERROR connecting to sproxy\n");

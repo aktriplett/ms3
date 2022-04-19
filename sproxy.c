@@ -18,13 +18,11 @@ void error(char *msg)
 struct sockaddr_in daemon_addr, cproxy_addr;
 char *daemonip = "127.0.0.1";
 char daemonbuf[BUFFERSIZE], cproxybuf[BUFFERSIZE], packetbuf[BUFFERSIZE];
-int option = 1;
 
 int DaemonConnect()
 {
   // Create socket.
   int DaemonSocket = socket(AF_INET, SOCK_STREAM, 0);
-  setsockopt(DaemonSocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
   if (DaemonSocket < 0)
   {
     error("ERROR opening Daemon socket");
@@ -47,7 +45,6 @@ int CproxyConnect(int portno)
 {
   // Create socket.
   int CproxySocket = socket(AF_INET, SOCK_STREAM, 0);
-  setsockopt(CproxySocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
   if (CproxySocket < 0)
   {
     error("ERROR opening Cproxy socket");
