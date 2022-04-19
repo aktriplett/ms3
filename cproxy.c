@@ -22,50 +22,38 @@ char telnetbuf[BUFFERSIZE], sproxybuf[BUFFERSIZE], packetbuf[BUFFERSIZE];
 //telnet connect function
 int TelnetConnect(int portno)
 {
-  // Create socket
-  int TelnetSocket = socket(AF_INET, SOCK_STREAM, 0);
+  int TelnetSocket = socket(AF_INET, SOCK_STREAM, 0);// Create socket
   if (TelnetSocket < 0)
   {
     error("ERROR opening Telnet socket");
   }
-  //clearing telnet_addr with bzero method
-  bzero((char *) &telnet_addr, sizeof(telnet_addr));
 
-  //saying to server address, all will be in internet address concept
-  telnet_addr.sin_family = AF_INET;
-  // get your address on your own when you start the program
-  telnet_addr.sin_addr.s_addr = INADDR_ANY;
-  // convert integer format to network format with htons
-  telnet_addr.sin_port = htons(portno);
+  bzero((char *) &telnet_addr, sizeof(telnet_addr));//clearing telnet_addr with bzero method
+  telnet_addr.sin_family = AF_INET;//saying to server address, all will be in internet address concept
+  telnet_addr.sin_addr.s_addr = INADDR_ANY;// get your address on your own when you start the program
+  telnet_addr.sin_port = htons(portno);// convert integer format to network format with htons
 
   // Bind socket
   if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
   {
     error("ERROR on binding Telnet Socket");
   }
-
   return TelnetSocket;
 }
 
 //server proxy connect function
 int SproxyConnect(char *host, int portno)
 {
-  // Create socket
-  int SproxySocket = socket(AF_INET, SOCK_STREAM, 0);
-
+  int SproxySocket = socket(AF_INET, SOCK_STREAM, 0);// Create socket
   if (SproxySocket < 0)
   {
     error("ERROR opening Sproxy socket");
   }
-
   bzero((char *) &sproxy_addr, sizeof(sproxy_addr));
-
   sproxy_addr.sin_family = AF_INET;
   inet_aton(host, &sproxy_addr.sin_addr.s_addr);
   sproxy_addr.sin_port = htons(portno);
-
   fprintf(stderr,"Received and converted server IP\n");
-
   return SproxySocket;
 }
 

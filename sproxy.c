@@ -21,50 +21,37 @@ char daemonbuf[BUFFERSIZE], cproxybuf[BUFFERSIZE], packetbuf[BUFFERSIZE];
 
 int DaemonConnect()
 {
-  // Create socket.
-  int DaemonSocket = socket(AF_INET, SOCK_STREAM, 0);
+  int DaemonSocket = socket(AF_INET, SOCK_STREAM, 0);// Create socket.
   if (DaemonSocket < 0)
   {
     error("ERROR opening Daemon socket");
   }
-  //clearing _addr with bzero method
-  bzero((char *) &daemon_addr, sizeof(daemon_addr));
+  bzero((char *) &daemon_addr, sizeof(daemon_addr));//clearing _addr with bzero method
 
-  //saying to server address, all will be in internet address concept
-  daemon_addr.sin_family = AF_INET;
-  // converting char ip addr
-  inet_aton(daemonip, &daemon_addr.sin_addr.s_addr);
-  // convert integer format to network format with htons
-  daemon_addr.sin_port = htons(23);
+  daemon_addr.sin_family = AF_INET;  //saying to server address, all will be in internet address concept
+  inet_aton(daemonip, &daemon_addr.sin_addr.s_addr);// converting char ip addr
+  daemon_addr.sin_port = htons(23);// convert integer format to network format with htons
   fprintf(stderr,"Received and converted Daemon IP\n");
-
   return DaemonSocket;
 }
 
 int CproxyConnect(int portno)
 {
-  // Create socket.
-  int CproxySocket = socket(AF_INET, SOCK_STREAM, 0);
+  int CproxySocket = socket(AF_INET, SOCK_STREAM, 0);// Create socket.
   if (CproxySocket < 0)
   {
     error("ERROR opening Cproxy socket");
   }
-
-  //clearing _addr with bzero method
-  bzero((char *) &cproxy_addr, sizeof(cproxy_addr));
-  //saying to server address, all will be in internet address concept
-  cproxy_addr.sin_family = AF_INET;
-  // get your address on your own when you start the program
-  cproxy_addr.sin_addr.s_addr = INADDR_ANY;
-  // convert integer format to network format with htons
-  cproxy_addr.sin_port = htons(portno);
+  bzero((char *) &cproxy_addr, sizeof(cproxy_addr));//clearing _addr with bzero method
+  cproxy_addr.sin_family = AF_INET;//saying to server address, all will be in internet address concept
+  cproxy_addr.sin_addr.s_addr = INADDR_ANY;// get your address on your own when you start the program
+  cproxy_addr.sin_port = htons(portno);// convert integer format to network format with htons
 
   // Bind socket
   if (bind(CproxySocket, (struct sockaddr *) &cproxy_addr, sizeof(cproxy_addr)) < 0)
   {
     error("ERROR on binding Cproxy Socket");
   }
-
   return CproxySocket;
 }
 
@@ -100,7 +87,6 @@ int main(int argc, char *argv[])
   }
 
   //set vars for creating sockets
-  int DaemonSocket, CproxySocket;
   int cproxyport;
   fd_set readfds;
   struct timeval tv;
@@ -112,14 +98,12 @@ int main(int argc, char *argv[])
 
   //port no passed in command line arg, to convert character to int we use atoi
   cproxyport = atoi(argv[1]);
-
   //calling socket set up functions
   //DaemonSocket = DaemonConnect();
-  CproxySocket = CproxyConnect(cproxyport);
-
-  //going into listen mode on sproxy, can handle 5 clients
-  listen(CproxySocket, 5);
+  int CproxySocket = CproxyConnect(cproxyport);
+  listen(CproxySocket, 5);//going into listen mode on sproxy, can handle 5 clients
   fprintf(stderr,"I'm listening on cproxy\n");
+
   while(1)
   {
     int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
@@ -129,8 +113,7 @@ int main(int argc, char *argv[])
     }
     fprintf(stderr,"Connected to a client on cproxy\n");
 
-    //connect to telnet daemon
-    DaemonSocket = DaemonConnect();
+    int DaemonSocket = DaemonConnect();
     if (connect(DaemonSocket, &daemon_addr, sizeof(daemon_addr)) < 0)
     {
       error("ERROR connecting to daemon");
