@@ -184,9 +184,9 @@ int main(int argc, char *argv[])
             else
             {
               fprintf(stderr, "Received message from telnet\n");
-              setPacket(2, telnetbuf, telnetrecv, 1);
-              send(SproxySocket, packetbuf, telnetrecv + 12, 0);
-              fprintf(stderr,"Forwarding telnet message to sproxy:%s\n",packetbuf);
+              //setPacket(2, telnetbuf, telnetrecv, 1);
+              send(SproxySocket, telnetbuf, telnetrecv, 0);//telnetrecv + 12
+              fprintf(stderr,"Forwarding telnet message to sproxy\n");
               telnetrecv = 0;
             }
 
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
               if (getPacketType(sproxybuf) == 2)//we are forwarding the sproxy message to telnet
               {
                   fprintf(stderr, "Got a ping\n");
-                  send(newtelnetsocket, getPacketMsg(sproxybuf), sproxyrecv - 12, 0);
+                  send(newtelnetsocket, sproxybuf, sproxyrecv, 0);//sproxyrecv - 12
               }
               else if (getPacketType(sproxybuf) == 1)//we received a heartbeat from sproxy and  will reset the hbcount
               {
@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
               }
               else
               {
-                fprintf(stderr, "Inside sproxy buffer: %s\n", sproxybuf);
+                fprintf(stderr, "Inside sproxy buffer\n");
               }
             }
           }

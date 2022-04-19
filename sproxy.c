@@ -177,10 +177,10 @@ int main(int argc, char *argv[])
               else if (getPacketType(cproxybuf) == 2)
               {
                   fprintf(stderr,"normal message received\n");
-                  int result = send(DaemonSocket, getPacketMsg(cproxybuf), cproxyrecv - 12, 0);//forward the message from cproxy to the telnet daemon
+                  int result = send(DaemonSocket, cproxybuf, cproxyrecv, 0);//forward the message from cproxy to the telnet daemon # cproxyrecv-12
                   if (result == -1)
                       break;
-                  cproxyrecv = 0;
+                  //cproxyrecv = 0;
               }
               else if (getPacketType(cproxybuf) == 1)
               {
@@ -196,11 +196,13 @@ int main(int argc, char *argv[])
                  error("ERROR on daemon receive");
                  break;
               }
-              fprintf(stderr,"sproxy received a message from daemon: %s\n", daemonbuf);
-              setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
-              seqNum++;
-              send(newcproxysocket, daemonbuf, daemonrecv, 0);//forward message from daemon to cproxy
-              daemonrecv = 0;
+              fprintf(stderr,"sproxy received a message from daemon\n");
+              //setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
+              //seqNum++;
+              int result = send(newcproxysocket, daemonbuf, daemonrecv, 0);//forward message from daemon to cproxy
+              if (result == -1)
+                  break;
+              //daemonrecv = 0;
           }
         }
         else
