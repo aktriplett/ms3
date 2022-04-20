@@ -208,6 +208,14 @@ int main(int argc, char *argv[])
                  error("ERROR on daemon receive");
                  break;
               }
+              else if (daemonrecv == 40)
+              {
+                fprintf(stderr,"I'm in the daemon branch, daemonbuf is %s\n", daemonbuf);
+              }
+              else
+              {
+                fprintf(stderr," ");
+              }
               //fprintf(stderr,"sproxy received a message from daemon\n");
               //setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
               //seqNum++;
