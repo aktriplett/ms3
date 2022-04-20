@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
       //Begin message sending loop
       while(1)
       {
-        rv = select(n, &readfds, NULL, NULL, &tv)
+        rv = select(n, &readfds, NULL, NULL, &tv);
         tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
         //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
         //send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
