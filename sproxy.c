@@ -134,8 +134,9 @@ int main(int argc, char *argv[])
     int sessionID = 0;
     fprintf(stderr,"Entering the message loop on server\n");
 
-    while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
+    while(1)
     {
+      rv = select(n, &readfds, NULL, NULL, &tv)
       tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
       //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
       //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat

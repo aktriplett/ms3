@@ -138,10 +138,11 @@ int main(int argc, char *argv[])
       int hbcount = 0;
       //set up the random hb int for the session and send to the server
       //sessionID = getSessionID();
-
+      rv = select(n, &readfds, NULL, NULL, &tv)
       //Begin message sending loop
-      while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
+      while(1)
       {
+        rv = select(n, &readfds, NULL, NULL, &tv)
         tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
         //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
         //send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
