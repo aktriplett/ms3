@@ -153,8 +153,6 @@ int main(int argc, char *argv[])
           send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
           fprintf(stderr,"timed out, incrementing hb count\n");
           hbcount++;
-          tv.tv_sec = 1;
-          tv.tv_usec = 0;
           if (hbcount == 3)
           {
               hbcount = 0;
@@ -171,6 +169,8 @@ int main(int argc, char *argv[])
               FD_SET(newcproxysocket, &readfds);
               fprintf(stderr,"sproxy reconnected to cproxy\n");
            }
+           tv.tv_sec = 1;
+           tv.tv_usec = 0;
         }
         else if (rv == 1)//no timeout, rv = 1 and we have a message to send
         {

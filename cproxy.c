@@ -158,8 +158,6 @@ int main(int argc, char *argv[])
           send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
           fprintf(stderr,"timed out, incrementing hb count\n");
           hbcount++;
-          tv.tv_sec = 1;
-          tv.tv_usec = 0;
           //heartbeat hits 3 so we assume the connection timed out and we close
           if (hbcount == 3)
           {
@@ -176,6 +174,8 @@ int main(int argc, char *argv[])
             }
             fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
           }
+          tv.tv_sec = 1;
+          tv.tv_usec = 0;
         }
         else if (rv == 1)//no timeout, rv = 1 and we have received
         {
