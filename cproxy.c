@@ -156,7 +156,8 @@ int main(int argc, char *argv[])
         {
           setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
           send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
-          fprintf(stderr,"timed out, incrementing hb count, rv is%d: \n", rv);
+          fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
+          //fprintf(stderr,"timed out, incrementing hb count, rv is%d: \n", rv);
           hbcount++;
           //heartbeat hits 3 so we assume the connection timed out and we close
           if (hbcount == 3)
@@ -225,7 +226,7 @@ int main(int argc, char *argv[])
               //}
               if (getPacketType(sproxybuf) == 1)//we received a heartbeat from sproxy and  will reset the hbcount
               {
-                  //fprintf(stderr, "Got a heartbeat, resetting hb count: %s\n", sproxybuf);
+                  fprintf(stderr, "Got a heartbeat, resetting hb count: %s\n", sproxybuf);
                   hbcount = 0;
               }
               else
