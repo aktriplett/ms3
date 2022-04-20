@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
       if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
       else n = SproxySocket + 1;
       struct timeval tv;
-      tv.tv_sec = 20;//timeout is 1 sec to increment hbcount
+      tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
       tv.tv_usec = 0;
       int hbcount = 0;
       //set up the random hb int for the session and send to the server
@@ -142,12 +142,17 @@ int main(int argc, char *argv[])
       while(1)
       {
         rv = select(n, &readfds, NULL, NULL, &tv);
-        tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
+
+        if (rv == -1)
+        {
+            error("ERROR engaging select function on client");
+        }
+        //tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
         //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
         //send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
         //fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
 
-        if (rv == 0)//Timeout occured, no message received so sending heartbeat
+        else if (rv == 0)//Timeout occured, no message received so sending heartbeat
         {
           setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
           send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
@@ -170,7 +175,7 @@ int main(int argc, char *argv[])
             fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
           }
         }
-        else//no timeout, rv = 1 and we have received
+        else if (rv == 1)//no timeout, rv = 1 and we have received
         {
           //fprintf(stderr,"zeroing buffers to receive message\n");
           //zero out both message buffers
@@ -226,6 +231,10 @@ int main(int argc, char *argv[])
               }
             }
           }
+        }
+        else
+        {
+          fprintf(stderr,"evaluating else, rv is %d\n", rv);
         }
         //fprintf(stderr, "I'm getting ready to send/recv more messages\n");
         //clear everything and get ready for more messages

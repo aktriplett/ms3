@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;  // find the largest descriptor, and plus one.
     else n = DaemonSocket + 1;
     //n = DaemonSocket + 1;
-    tv.tv_sec = 20;//timeout is 1 sec to increment hbcount
+    tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
     tv.tv_usec = 0;
     int hbcount = 0;
     int sessionID = 0;
@@ -137,12 +137,17 @@ int main(int argc, char *argv[])
     while(1)
     {
       rv = select(n, &readfds, NULL, NULL, &tv);
-      tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
+
+      if (rv == -1)
+      {
+          error("ERROR engaging select function on client");
+      }
+      //tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
       //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
       //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
       //fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
 
-      if (rv == 0)//Timeout occured, no message received so sending heartbeat
+      else if (rv == 0)//Timeout occured, no message received so sending heartbeat
       {
           setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
           send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
@@ -165,7 +170,7 @@ int main(int argc, char *argv[])
               fprintf(stderr,"sproxy reconnected to cproxy\n");
            }
         }
-        else //no timeout, rv = 1 and we have a message to send
+        else if (rv == 1)//no timeout, rv = 1 and we have a message to send
         {
           //fprintf(stderr,"no timeout, we have a message\n");
           bzero(daemonbuf, sizeof(daemonbuf));//zero out both message buffers
@@ -207,6 +212,11 @@ int main(int argc, char *argv[])
               send(newcproxysocket, daemonbuf, daemonrecv, 0);//forward message from daemon to cproxy
               //daemonrecv = 0;
           }
+        }
+
+        else
+        {
+          fprintf(stderr,"evaluating else, rv is %d\n", rv);
         }
         //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
         //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
