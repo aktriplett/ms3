@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
           if (FD_ISSET(newcproxysocket, &readfds))
           {
               cproxyrecv = recv(newcproxysocket, cproxybuf, sizeof(cproxybuf), 0);
-              fprintf(stderr,"I'm in the cproxy branch, cproxy recv is %d\n", cproxyrecv);
+              //fprintf(stderr,"I'm in the cproxy branch, cproxy recv is %d\n", cproxyrecv);
               if (cproxyrecv <= 0)
               {
                 error("ERROR on cproxy receive");
@@ -202,20 +202,20 @@ int main(int argc, char *argv[])
           if (FD_ISSET(DaemonSocket, &readfds))
           {
               daemonrecv = recv(DaemonSocket, daemonbuf, sizeof(daemonbuf), 0);
-              fprintf(stderr,"I'm in the daemon branch, daemon recv is %d\n", daemonrecv);
+              //fprintf(stderr,"I'm in the daemon branch, daemon recv is %d\n", daemonrecv);
               if (daemonrecv <= 0)
               {
                  error("ERROR on daemon receive");
                  break;
               }
-              else if (daemonrecv == 40)
-              {
-                fprintf(stderr,"I'm in the daemon branch, daemonbuf is %s\n", daemonbuf);
-              }
-              else
-              {
-                fprintf(stderr," ");
-              }
+              //else if (daemonrecv == 40)
+              //{
+                //fprintf(stderr,"I'm in the daemon branch, daemonbuf is %s\n", daemonbuf);
+              //}
+              //else
+              //{
+                //fprintf(stderr," ");
+              //}
               //fprintf(stderr,"sproxy received a message from daemon\n");
               //setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
               //seqNum++;
