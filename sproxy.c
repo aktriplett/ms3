@@ -178,8 +178,8 @@ int main(int argc, char *argv[])
 
           if (FD_ISSET(newcproxysocket, &readfds))
           {
-              fprintf(stderr,"I'm in the cproxy branch\n");
               cproxyrecv = recv(newcproxysocket, cproxybuf, sizeof(cproxybuf), 0);
+              fprintf(stderr,"I'm in the cproxy branch, cproxy recv is %d\n", cproxyrecv);
               if (cproxyrecv <= 0)
               {
                 error("ERROR on cproxy receive");
@@ -201,8 +201,8 @@ int main(int argc, char *argv[])
           }
           if (FD_ISSET(DaemonSocket, &readfds))
           {
-              fprintf(stderr,"I'm in the daemon branch\n");
               daemonrecv = recv(DaemonSocket, daemonbuf, sizeof(daemonbuf), 0);
+              fprintf(stderr,"I'm in the daemon branch, daemon recv is %d\n", daemonrecv);
               if (daemonrecv <= 0)
               {
                  error("ERROR on daemon receive");
