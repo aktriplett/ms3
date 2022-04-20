@@ -153,6 +153,8 @@ int main(int argc, char *argv[])
           send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
           fprintf(stderr,"timed out, incrementing hb count\n");
           hbcount++;
+          tv.tv_sec = 1;
+          tv.tv_usec = 0;
           if (hbcount == 3)
           {
               hbcount = 0;
@@ -234,8 +236,8 @@ int main(int argc, char *argv[])
         FD_ZERO(&readfds);
         FD_SET(newcproxysocket, &readfds);
         FD_SET(DaemonSocket, &readfds);
-        tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
-        tv.tv_usec = 0;
+        //tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
+        //tv.tv_usec = 0;
         if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;
         else n = DaemonSocket + 1;
     }
