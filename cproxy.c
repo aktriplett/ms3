@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
         FD_ZERO(&readfds);
         FD_SET(newtelnetsocket, &readfds);
         FD_SET(SproxySocket, &readfds);
-        tv.tv_sec = 1;
+        tv.tv_sec = 20;
         tv.tv_usec = 0;
         if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
         else n = SproxySocket + 1;
