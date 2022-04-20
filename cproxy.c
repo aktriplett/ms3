@@ -138,7 +138,6 @@ int main(int argc, char *argv[])
       int hbcount = 0;
       //set up the random hb int for the session and send to the server
       //sessionID = getSessionID();
-      rv = select(n, &readfds, NULL, NULL, &tv)
       //Begin message sending loop
       while(1)
       {
