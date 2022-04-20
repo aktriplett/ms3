@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
           if (FD_ISSET(newtelnetsocket, &readfds))
           {
             telnetrecv = recv(newtelnetsocket, telnetbuf, sizeof(telnetbuf), 0);
-            fprintf(stderr,"I'm in the telnetbranch, telnet recv is %d\n", telnetrecv);
+            //fprintf(stderr,"I'm in the telnetbranch, telnet recv is %d\n", telnetrecv);
             if (telnetrecv < 0)
             {
               error("ERROR on telnet receive\n");
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
           if (FD_ISSET(SproxySocket, &readfds))
           {
             sproxyrecv = recv(SproxySocket, sproxybuf, sizeof(sproxybuf), 0);
-            fprintf(stderr,"I'm in the sproxy branch, sproxy recv is %d\n", sproxyrecv);
+            //fprintf(stderr,"I'm in the sproxy branch, sproxy recv is %d\n", sproxyrecv);
             if (sproxyrecv < 0)
             {
               error("ERROR on sproxy receive\n");
