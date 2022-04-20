@@ -141,8 +141,8 @@ int main(int argc, char *argv[])
       //Begin message sending loop
       while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
       {
-        //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
-        //send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
+        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
+        send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
         //fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
 
         if (rv == 0)//Timeout occured, no message received so sending heartbeat
@@ -224,8 +224,8 @@ int main(int argc, char *argv[])
         }
         //fprintf(stderr, "I'm getting ready to send/recv more messages\n");
         //clear everything and get ready for more messages
-        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
-        send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
+        //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
+        //send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
         FD_ZERO(&readfds);
         FD_SET(newtelnetsocket, &readfds);
         FD_SET(SproxySocket, &readfds);

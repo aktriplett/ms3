@@ -135,8 +135,8 @@ int main(int argc, char *argv[])
 
     while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
     {
-      //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
-      //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
+      setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
+      send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
       //fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
 
       if (rv == 0)//Timeout occured, no message received so sending heartbeat
@@ -202,8 +202,8 @@ int main(int argc, char *argv[])
               //daemonrecv = 0;
           }
         }
-        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
-        send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
+        //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
+        //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
         //fprintf(stderr,"I'm waiting for a new message on sproxy\n");
         FD_ZERO(&readfds);
         FD_SET(newcproxysocket, &readfds);
