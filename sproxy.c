@@ -135,8 +135,8 @@ int main(int argc, char *argv[])
 
     while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
     {
-      setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
-      send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
+      //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
+      //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
       //fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
 
       if (rv == 0)//Timeout occured, no message received so sending heartbeat
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
               fprintf(stderr,"sproxy reconnected to cproxy\n");
            }
         }
-        else if (rv >0) //no timeout, rv = 1 and we have a message to send
+        else //no timeout, rv = 1 and we have a message to send
         {
           //fprintf(stderr,"no timeout, we have a message\n");
           bzero(daemonbuf, sizeof(daemonbuf));//zero out both message buffers
@@ -174,18 +174,17 @@ int main(int argc, char *argv[])
                 break;
               }
 
-              else if (getPacketType(cproxybuf) == 2)
-              {
-                  fprintf(stderr,"normal message received\n");
-                  int result = send(DaemonSocket, cproxybuf, cproxyrecv, 0);//forward the message from cproxy to the telnet daemon # cproxyrecv-12
-                  if (result == -1)
-                      break;
-                  //cproxyrecv = 0;
-              }
               else if (getPacketType(cproxybuf) == 1)
               {
                   //fprintf(stderr,"heartbeat message received, resetting hbcount: %s\n", cproxybuf);
                   hbcount = 0;
+              }
+
+              else//getPacketType(cproxybuf) == 2)
+              {
+                  fprintf(stderr,"normal message received\n");
+                  send(DaemonSocket, cproxybuf, cproxyrecv, 0);//forward the message from cproxy to the telnet daemon # cproxyrecv-12
+                  //cproxyrecv = 0;
               }
           }
           if (FD_ISSET(DaemonSocket, &readfds))
@@ -199,16 +198,12 @@ int main(int argc, char *argv[])
               fprintf(stderr,"sproxy received a message from daemon\n");
               //setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
               //seqNum++;
-              int result = send(newcproxysocket, daemonbuf, daemonrecv, 0);//forward message from daemon to cproxy
-              if (result == -1)
-                  break;
+              send(newcproxysocket, daemonbuf, daemonrecv, 0);//forward message from daemon to cproxy
               //daemonrecv = 0;
           }
         }
-        else
-        {
-          fprintf(stderr, "no timeout, no messages\n");
-        }
+        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
+        send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
         //fprintf(stderr,"I'm waiting for a new message on sproxy\n");
         FD_ZERO(&readfds);
         FD_SET(newcproxysocket, &readfds);

@@ -141,8 +141,8 @@ int main(int argc, char *argv[])
       //Begin message sending loop
       while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
       {
-        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
-        send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
+        //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
+        //send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
         //fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
 
         if (rv == 0)//Timeout occured, no message received so sending heartbeat
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
             fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
           }
         }
-        else if (rv > 0)//no timeout, rv = 1 and we have received
+        else//no timeout, rv = 1 and we have received
         {
           //fprintf(stderr,"zeroing buffers to receive message\n");
           //zero out both message buffers
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
               //setPacket(2, telnetbuf, telnetrecv, 1);
               send(SproxySocket, telnetbuf, telnetrecv, 0);//telnetrecv + 12
               fprintf(stderr,"Forwarding telnet message to sproxy\n");
-              telnetrecv = 0;
+              //telnetrecv = 0;
             }
 
           }
@@ -204,29 +204,28 @@ int main(int argc, char *argv[])
             else
             {
               //fprintf(stderr, "Received message from sproxy\n");
-              if (getPacketType(sproxybuf) == 2)//we are forwarding the sproxy message to telnet
-              {
-                  fprintf(stderr, "Got a ping\n");
-                  send(newtelnetsocket, sproxybuf, sproxyrecv, 0);//sproxyrecv - 12
-              }
-              else if (getPacketType(sproxybuf) == 1)//we received a heartbeat from sproxy and  will reset the hbcount
+              //if (getPacketType(sproxybuf) == 2)//we are forwarding the sproxy message to telnet
+              //{
+              //    fprintf(stderr, "Got a ping\n");
+              //    send(newtelnetsocket, sproxybuf, sproxyrecv, 0);//sproxyrecv - 12
+              //}
+              if (getPacketType(sproxybuf) == 1)//we received a heartbeat from sproxy and  will reset the hbcount
               {
                   //fprintf(stderr, "Got a heartbeat, resetting hb count: %s\n", sproxybuf);
                   hbcount = 0;
               }
               else
               {
-                fprintf(stderr, "Inside sproxy buffer\n");
+                send(newtelnetsocket, sproxybuf, sproxyrecv, 0);//sproxyrecv - 12
+                //fprintf(stderr, "Got an non-header message from sproxy\n");
               }
             }
           }
         }
-        else
-        {
-          fprintf(stderr, "no timeout, no messages\n");
-        }
         //fprintf(stderr, "I'm getting ready to send/recv more messages\n");
         //clear everything and get ready for more messages
+        setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
+        send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
         FD_ZERO(&readfds);
         FD_SET(newtelnetsocket, &readfds);
         FD_SET(SproxySocket, &readfds);
