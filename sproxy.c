@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;  // find the largest descriptor, and plus one.
     else n = DaemonSocket + 1;
     //n = DaemonSocket + 1;
-    tv.tv_sec = 20;//timeout is 1 sec to increment hbcount
+    tv.tv_sec = 5;//timeout is 1 sec to increment hbcount
     tv.tv_usec = 0;
     int hbcount = 0;
     int sessionID = 0;
@@ -178,6 +178,7 @@ int main(int argc, char *argv[])
 
           if (FD_ISSET(newcproxysocket, &readfds))
           {
+              fprintf(stderr,"I'm in the cproxy branch\n");
               cproxyrecv = recv(newcproxysocket, cproxybuf, sizeof(cproxybuf), 0);
               if (cproxyrecv <= 0)
               {
@@ -193,20 +194,21 @@ int main(int argc, char *argv[])
 
               else//getPacketType(cproxybuf) == 2)
               {
-                  fprintf(stderr,"normal message received\n");
+                  //fprintf(stderr,"normal message received\n");
                   send(DaemonSocket, cproxybuf, cproxyrecv, 0);//forward the message from cproxy to the telnet daemon # cproxyrecv-12
                   //cproxyrecv = 0;
               }
           }
           if (FD_ISSET(DaemonSocket, &readfds))
           {
+              fprintf(stderr,"I'm in the daemon branch\n");
               daemonrecv = recv(DaemonSocket, daemonbuf, sizeof(daemonbuf), 0);
               if (daemonrecv <= 0)
               {
                  error("ERROR on daemon receive");
                  break;
               }
-              fprintf(stderr,"sproxy received a message from daemon\n");
+              //fprintf(stderr,"sproxy received a message from daemon\n");
               //setPacket(2, daemonbuf, daemonrecv, seqNum); //not a heartbeat, other message
               //seqNum++;
               send(newcproxysocket, daemonbuf, daemonrecv, 0);//forward message from daemon to cproxy
@@ -224,7 +226,7 @@ int main(int argc, char *argv[])
         FD_ZERO(&readfds);
         FD_SET(newcproxysocket, &readfds);
         FD_SET(DaemonSocket, &readfds);
-        tv.tv_sec = 20;//timeout is 1 sec to increment hbcount
+        tv.tv_sec = 5;//timeout is 1 sec to increment hbcount
         tv.tv_usec = 0;
         if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;
         else n = DaemonSocket + 1;

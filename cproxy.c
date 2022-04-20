@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
       if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
       else n = SproxySocket + 1;
       struct timeval tv;
-      tv.tv_sec = 20;//timeout is 1 sec to increment hbcount
+      tv.tv_sec = 5;//timeout is 1 sec to increment hbcount
       tv.tv_usec = 0;
       int hbcount = 0;
       //set up the random hb int for the session and send to the server
@@ -185,6 +185,7 @@ int main(int argc, char *argv[])
           //check the telnet buffer
           if (FD_ISSET(newtelnetsocket, &readfds))
           {
+            fprintf(stderr,"I'm in the telnet branch\n");
             telnetrecv = recv(newtelnetsocket, telnetbuf, sizeof(telnetbuf), 0);
             if (telnetrecv < 0)
             {
@@ -193,10 +194,10 @@ int main(int argc, char *argv[])
             }
             else
             {
-              fprintf(stderr, "Received message from telnet\n");
+              //fprintf(stderr, "Received message from telnet\n");
               //setPacket(2, telnetbuf, telnetrecv, 1);
               send(SproxySocket, telnetbuf, telnetrecv, 0);//telnetrecv + 12
-              fprintf(stderr,"Forwarding telnet message to sproxy\n");
+              //fprintf(stderr,"Forwarding telnet message to sproxy\n");
               //telnetrecv = 0;
             }
 
@@ -205,6 +206,7 @@ int main(int argc, char *argv[])
           //check the sproxy buffer
           if (FD_ISSET(SproxySocket, &readfds))
           {
+            fprintf(stderr,"I'm in the sproxy branch\n");
             sproxyrecv = recv(SproxySocket, sproxybuf, sizeof(sproxybuf), 0);
             if (sproxyrecv < 0)
             {
@@ -243,7 +245,7 @@ int main(int argc, char *argv[])
         FD_ZERO(&readfds);
         FD_SET(newtelnetsocket, &readfds);
         FD_SET(SproxySocket, &readfds);
-        tv.tv_sec = 20;
+        tv.tv_sec = 5;
         tv.tv_usec = 0;
         if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;
         else n = SproxySocket + 1;
