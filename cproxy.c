@@ -107,6 +107,7 @@ int main(int argc, char *argv[])
     listen(TelnetSocket, 5);
     fprintf(stderr,"I'm listening on telnet\n");
 
+    //telnet local host triggers this loop
     while(1)
     {
       int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
@@ -132,7 +133,7 @@ int main(int argc, char *argv[])
       if (newtelnetsocket > SproxySocket) n = newtelnetsocket + 1;// find the largest descriptor, and plus one.
       else n = SproxySocket + 1;
       struct timeval tv;
-      tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
+      tv.tv_sec = 10;//timeout is 1 sec to increment hbcount
       tv.tv_usec = 0;
       int hbcount = 0;
       //set up the random hb int for the session and send to the server
@@ -141,6 +142,7 @@ int main(int argc, char *argv[])
       //Begin message sending loop
       while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
       {
+        tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
         //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
         //send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
         //fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
@@ -163,6 +165,7 @@ int main(int argc, char *argv[])
             if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
             {
               error("ERROR connecting NEW sproxy\n");
+              break;
             }
             fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
           }
@@ -180,7 +183,7 @@ int main(int argc, char *argv[])
             telnetrecv = recv(newtelnetsocket, telnetbuf, sizeof(telnetbuf), 0);
             if (telnetrecv < 0)
             {
-              error("ERROR no telnet message received\n");
+              error("ERROR on telnet receive\n");
               break;
             }
             else
@@ -200,7 +203,7 @@ int main(int argc, char *argv[])
             sproxyrecv = recv(SproxySocket, sproxybuf, sizeof(sproxybuf), 0);
             if (sproxyrecv < 0)
             {
-              error("ERROR no sproxy message received\n");
+              error("ERROR on sproxy receive\n");
               break;
             }
             else

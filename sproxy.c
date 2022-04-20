@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
   listen(CproxySocket, 5);//going into listen mode on sproxy, can handle 5 clients
   fprintf(stderr,"I'm listening on cproxy\n");
 
+  //telnet local host triggers this loop
   while(1)
   {
     int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
@@ -127,7 +128,7 @@ int main(int argc, char *argv[])
     if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;  // find the largest descriptor, and plus one.
     else n = DaemonSocket + 1;
     //n = DaemonSocket + 1;
-    tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
+    tv.tv_sec = 10;//timeout is 1 sec to increment hbcount
     tv.tv_usec = 0;
     int hbcount = 0;
     int sessionID = 0;
@@ -135,6 +136,7 @@ int main(int argc, char *argv[])
 
     while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
     {
+      tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
       //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
       //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
       //fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
@@ -155,6 +157,7 @@ int main(int argc, char *argv[])
               if (newcproxysocket < 0)
               {
                 error("ERROR on NEW cproxy accept");
+                break;
               }
 
               FD_SET(newcproxysocket, &readfds);
