@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;  // find the largest descriptor, and plus one.
     else n = DaemonSocket + 1;
     //n = DaemonSocket + 1;
-    tv.tv_sec = 10;//timeout is 1 sec to increment hbcount
+    tv.tv_sec = 20;//timeout is 1 sec to increment hbcount
     tv.tv_usec = 0;
     int hbcount = 0;
     int sessionID = 0;
