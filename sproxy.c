@@ -135,12 +135,14 @@ int main(int argc, char *argv[])
 
     while((rv = select(n, &readfds, NULL, NULL, &tv)) >= 0)
     {
-      setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
-      send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
+      //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
+      //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
       //fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
 
       if (rv == 0)//Timeout occured, no message received so sending heartbeat
       {
+          setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
+          send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
           fprintf(stderr,"timed out, incrementing hb count\n");
           hbcount++;
           if (hbcount == 3)
