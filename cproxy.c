@@ -83,6 +83,11 @@ int getPacketType(char* packet)
     return *((int*) packet);//starting from initial packet pointer and moving an integer length down is int data
 }
 
+int getSesh(char* packet)
+{
+    return *((int*) (packet + 4));
+}
+
 char* getPacketMsg(char* packet)
 {
     return packet + 12;
@@ -158,7 +163,7 @@ int main(int argc, char *argv[])
 
         else if (rv == 0)//Timeout occured, no message received so sending heartbeat
         {
-          setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message (ID 1)
+          setPacket(1, "hb", 2, sessionID);//we know we have to send a heartbeat format message (ID 1)
           send(SproxySocket, packetbuf, 14, 0);//send the heartbeat contained in packet buf to sproxy
           fprintf(stderr,"Client sent a heartbeat message to server:%s\n",packetbuf);
           //fprintf(stderr,"timed out, incrementing hb count, rv is%d: \n", rv);

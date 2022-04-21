@@ -72,6 +72,11 @@ int getPacketType(char* packet) {
     return *((int*) packet);
 }
 
+int getSesh(char* packet)
+{
+    return *((int*) (packet + 4));
+}
+
 char* getPacketMsg(char* packet) {
     return packet + 12;
 }
@@ -151,7 +156,7 @@ int main(int argc, char *argv[])
 
       else if (rv == 0)//Timeout occured, no message received so sending heartbeat
       {
-          setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
+          setPacket(1, "hb", 2, sessionID);//we know we have to send a heartbeat format message
           send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
           fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
           //fprintf(stderr,"timed out, incrementing hb count, rv is%d: \n", rv);
@@ -168,7 +173,6 @@ int main(int argc, char *argv[])
                 error("ERROR on NEW cproxy accept");
                 break;
               }
-
               FD_SET(newcproxysocket, &readfds);
               fprintf(stderr,"sproxy reconnected to cproxy\n");
            }
@@ -194,6 +198,13 @@ int main(int argc, char *argv[])
               else if (getPacketType(cproxybuf) == 1)
               {
                   fprintf(stderr,"heartbeat message received, resetting hbcount: %s\n", cproxybuf);
+                  int tempID = getSesh(cproxybuf);
+                  if(sessionID != tempID && sessionID != 0)
+                  {
+                    break;
+                  }
+                  sessionID = tempID;
+
                   hbcount = 0;
               }
 
