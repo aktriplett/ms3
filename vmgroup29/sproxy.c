@@ -31,7 +31,7 @@ int DaemonConnect()
   daemon_addr.sin_family = AF_INET;  //saying to server address, all will be in internet address concept
   inet_aton(daemonip, &daemon_addr.sin_addr.s_addr);// converting char ip addr
   daemon_addr.sin_port = htons(23);// convert integer format to network format with htons
-  fprintf(stderr,"Received and converted Daemon IP\n");
+  //fprintf(stderr,"Received and converted Daemon IP\n");
   return DaemonSocket;
 }
 
@@ -119,14 +119,14 @@ int main(int argc, char *argv[])
     {
       error("ERROR on first cproxy accept");
     }
-    fprintf(stderr,"Connected to a client on cproxy\n");
+    //fprintf(stderr,"Connected to a client on cproxy\n");
 
     int DaemonSocket = DaemonConnect();
     if (connect(DaemonSocket, &daemon_addr, sizeof(daemon_addr)) < 0)
     {
       error("ERROR connecting to daemon");
     }
-    fprintf(stderr,"Connected to telnet daemon\n");
+    //fprintf(stderr,"Connected to telnet daemon\n");
 
     //set vars for select
     FD_ZERO(&readfds);// clear the set
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
     tv.tv_usec = 0;
     int hbcount = 0;
     int sessionID = 0;
-    fprintf(stderr,"Entering the message loop on server\n");
+    //fprintf(stderr,"Entering the message loop on server\n");
 
     while(1)
     {
@@ -199,14 +199,14 @@ int main(int argc, char *argv[])
 
               else if (getPacketType(cproxybuf) == 1)
               {
-                  fprintf(stderr,"heartbeat message received, resetting hbcount: %s\n", cproxybuf);
+                  //fprintf(stderr,"heartbeat message received, resetting hbcount: %s\n", cproxybuf);
                   int tempID = getSesh(cproxybuf);
                   if(sessionID != tempID && sessionID != 0)
                   {
                     break;
                   }
                   sessionID = tempID;
-                  fprintf(stderr,"Session ID: %d\n", sessionID);
+                  //fprintf(stderr,"Session ID: %d\n", sessionID);
 
                   hbcount = 0;
               }
@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
 
         else
         {
-          fprintf(stderr,"evaluating else, rv is %d\n", rv);
+          //fprintf(stderr,"evaluating else, rv is %d\n", rv);
         }
         //setPacket(1, "hb", 2, hbcount);//we know we have to send a heartbeat format message
         //send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
