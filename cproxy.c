@@ -106,10 +106,10 @@ int main(int argc, char *argv[])
     //fprintf(stderr,"I'm listening on telnet\n");
 
     //telnet local host triggers this loop
-    listen(TelnetSocket, 5);
+    //listen(TelnetSocket, 5);
     while(1)
     {
-      //listen(TelnetSocket, 5);
+      listen(TelnetSocket, 5);
       fprintf(stderr,"I'm listening on telnet\n");
       int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
       if (newtelnetsocket <0)
@@ -168,11 +168,11 @@ int main(int argc, char *argv[])
             close(SproxySocket);//close disconnected socket
             int SproxySocket = SproxyConnect(argv[2],sproxyport);
 
-            //if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
-            // {
-            //   error("ERROR on binding Telnet test");
-            //   break;
-            // }
+            if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
+            {
+              error("ERROR on binding Telnet test");
+              break;
+            }
 
             if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
             {
