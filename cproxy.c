@@ -250,7 +250,12 @@ int main(int argc, char *argv[])
               else
               {
                 send(newtelnetsocket, sproxybuf, sproxyrecv, 0);//sproxyrecv - 12
-                fprintf(stderr, "Got an non-header message from sproxy: %s\n", sproxybuf);
+                if (sproxyrecv == 0)
+                {
+                  fprintf(stderr, "bye\n");
+                  break;
+                }
+                //fprintf(stderr, "Got an non-header message from sproxy: %s\n", sproxybuf);
               }
             }
           }
