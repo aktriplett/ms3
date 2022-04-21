@@ -101,12 +101,14 @@ int main(int argc, char *argv[])
   //calling socket set up functions
   //DaemonSocket = DaemonConnect();
   int CproxySocket = CproxyConnect(cproxyport);
-  listen(CproxySocket, 5);//going into listen mode on sproxy, can handle 5 clients
-  fprintf(stderr,"I'm listening on cproxy\n");
+  //listen(CproxySocket, 5);//going into listen mode on sproxy, can handle 5 clients
+  //fprintf(stderr,"I'm listening on cproxy\n");
 
   //telnet local host triggers this loop
   while(1)
   {
+    listen(CproxySocket, 5);//going into listen mode on sproxy, can handle 5 clients
+    fprintf(stderr,"I'm listening on cproxy\n");
     int newcproxysocket = accept(CproxySocket, (struct sockaddr *) &cproxy_addr, &len1);
     if (newcproxysocket < 0)
     {
@@ -237,8 +239,6 @@ int main(int argc, char *argv[])
         FD_ZERO(&readfds);
         FD_SET(newcproxysocket, &readfds);
         FD_SET(DaemonSocket, &readfds);
-        //tv.tv_sec = 1;//timeout is 1 sec to increment hbcount
-        //tv.tv_usec = 0;
         if (newcproxysocket > DaemonSocket) n = newcproxysocket + 1;
         else n = DaemonSocket + 1;
     }

@@ -104,12 +104,14 @@ int main(int argc, char *argv[])
     int TelnetSocket = TelnetConnect(telnetport);
     //int SproxySocket = SproxyConnect(argv[2],sproxyport);
 
-    listen(TelnetSocket, 5);
-    fprintf(stderr,"I'm listening on telnet\n");
+    //listen(TelnetSocket, 5);
+    //fprintf(stderr,"I'm listening on telnet\n");
 
     //telnet local host triggers this loop
     while(1)
     {
+      listen(TelnetSocket, 5);
+      fprintf(stderr,"I'm listening on telnet\n");
       int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
       if (newtelnetsocket <0)
       {
@@ -254,7 +256,6 @@ int main(int argc, char *argv[])
     fprintf(stderr,"Timed out - Closing all connections and setting new IP:\n");
     close(newtelnetsocket);
     close(SproxySocket);
-    break;
   }
   return 0;
 }
