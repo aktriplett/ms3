@@ -190,7 +190,6 @@ int main(int argc, char *argv[])
             if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
             {
               error("ERROR connecting NEW sproxy\n");
-              ipIssue = 0;
               break;
             }
             fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
@@ -234,7 +233,6 @@ int main(int argc, char *argv[])
             if (sproxyrecv < 0)
             {
               error("ERROR on sproxy receive\n");
-              ipIssue = 1;
               break;
             }
             else
