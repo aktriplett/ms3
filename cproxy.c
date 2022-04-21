@@ -111,6 +111,7 @@ int main(int argc, char *argv[])
     int sproxyport = atoi(argv[3]);
     int TelnetSocket = TelnetConnect(telnetport);
     int ipIssue = 1;
+    int newtelnetsocket = 0;
     //int SproxySocket = SproxyConnect(argv[2],sproxyport);
     //fprintf(stderr,"I'm listening on telnet\n");
 
@@ -122,7 +123,7 @@ int main(int argc, char *argv[])
       {
         listen(TelnetSocket, 5);
         fprintf(stderr,"I'm listening on telnet\n");
-        int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
+        newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
         if (newtelnetsocket <0)
         {
           error("ERROR on telnet accept\n");
