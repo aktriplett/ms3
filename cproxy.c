@@ -110,6 +110,7 @@ int main(int argc, char *argv[])
     int telnetport = atoi(argv[1]);//port no passed in command line arg, to convert character to int we use atoi
     int sproxyport = atoi(argv[3]);
     int TelnetSocket = TelnetConnect(telnetport);
+    int ipIssue = 1;
     //int SproxySocket = SproxyConnect(argv[2],sproxyport);
     //fprintf(stderr,"I'm listening on telnet\n");
 
@@ -117,14 +118,25 @@ int main(int argc, char *argv[])
     //listen(TelnetSocket, 5);
     while(1)
     {
-      listen(TelnetSocket, 5);
-      fprintf(stderr,"I'm listening on telnet\n");
-      int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
-      if (newtelnetsocket <0)
+      if (ipIssue == 1)
       {
-        error("ERROR on telnet accept\n");
+        listen(TelnetSocket, 5);
+        fprintf(stderr,"I'm listening on telnet\n");
+        int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
+        if (newtelnetsocket <0)
+        {
+          error("ERROR on telnet accept\n");
+        }
+        fprintf(stderr,"Connected to telnet local host\n");
       }
-      fprintf(stderr,"Connected to telnet local host\n");
+      // listen(TelnetSocket, 5);
+      // fprintf(stderr,"I'm listening on telnet\n");
+      // int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
+      // if (newtelnetsocket <0)
+      // {
+      //   error("ERROR on telnet accept\n");
+      // }
+      // fprintf(stderr,"Connected to telnet local host\n");
 
       //connect to sproxy
       int SproxySocket = SproxyConnect(argv[2],sproxyport);
@@ -189,6 +201,7 @@ int main(int argc, char *argv[])
             if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
             {
               error("ERROR connecting NEW sproxy\n");
+              ipIssue = 0;
               break;
             }
             fprintf(stderr,"cproxy made a NEW connection to sproxy\n");
@@ -232,6 +245,7 @@ int main(int argc, char *argv[])
             if (sproxyrecv < 0)
             {
               error("ERROR on sproxy receive\n");
+              ipIssue = 1;
               break;
             }
             else
@@ -275,7 +289,11 @@ int main(int argc, char *argv[])
         else n = SproxySocket + 1;
       }
     fprintf(stderr,"Timed out - Closing all connections and setting new IP:\n");
-    close(newtelnetsocket);
+    if(ipIssue == 1)
+    {
+      close(newtelnetsocket);
+    }
+    //close(newtelnetsocket);
     close(SproxySocket);
   }
   return 0;
