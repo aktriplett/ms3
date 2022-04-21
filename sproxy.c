@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
                     break;
                   }
                   sessionID = tempID;
-                  fprintf(stderr,"Session ID: %d\n", sessionID);
+                  //fprintf(stderr,"Session ID: %d\n", sessionID);
 
                   hbcount = 0;
               }
