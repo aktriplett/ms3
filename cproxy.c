@@ -179,8 +179,7 @@ int main(int argc, char *argv[])
             hbcount = 0;//reset hb count
             close(SproxySocket);//close disconnected socket
             int SproxySocket = SproxyConnect(argv[2],sproxyport);
-            int check = 2;
-            check = connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr));
+            int check = connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr));
             if (check < 0)
             {
               error("ERROR connecting NEW sproxy\n");
@@ -194,12 +193,9 @@ int main(int argc, char *argv[])
 
             else
             {
-              if(bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
-              {
-                fprintf(stderr,"ERROR on binding Telnet test\n");
                 break;
-              }
             }
+          }
 
           }
           tv.tv_sec = 1;
