@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
       {
           setPacket(1, "hb", 2, sessionID);//we know we have to send a heartbeat format message
           send(newcproxysocket, packetbuf, sizeof(packetbuf), 0);//send the heartbeat
-          fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
+          //fprintf(stderr,"Server sent a heartbeat message to client: %s\n", packetbuf);
           //fprintf(stderr,"timed out, incrementing hb count, rv is%d: \n", rv);
           hbcount++;
           if (hbcount == 3)
