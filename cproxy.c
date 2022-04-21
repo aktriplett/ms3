@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
             hbcount = 0;//reset hb count
             close(SproxySocket);//close disconnected socket
             int SproxySocket = SproxyConnect(argv[2],sproxyport);
-            int check == 2;
+            int check = 2;
             check = connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr));
             if (check < 0)
             {
