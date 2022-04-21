@@ -57,10 +57,12 @@ int SproxyConnect(char *host, int portno)
   return SproxySocket;
 }
 
-//int getSessionID()
-//int rannum = 0;
-//  rannum = rand();
-//  return rannum;
+int getSessionID()
+{
+  int rannum = 0;
+  rannum = rand();
+  return rannum;
+}
 
 char* setPacket(int type, char* payload, int len, int seq)
 {
@@ -138,7 +140,8 @@ int main(int argc, char *argv[])
       tv.tv_usec = 0;
       int hbcount = 0;
       //set up the random hb int for the session and send to the server
-      //sessionID = getSessionID();
+      sessionID = getSessionID();
+      fprintf(stderr,"SessionID is:%d\n",sessionID);
       //Begin message sending loop
       while(1)
       {
