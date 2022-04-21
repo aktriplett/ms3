@@ -186,6 +186,11 @@ int main(int argc, char *argv[])
               break;
             }
 
+            else if(check == 0)
+            {
+              fprintf(stderr,"cproxy made a NEW connection to sproxy, returns: %d\n", check);
+            }
+
             // else if(bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
             // {
             //   fprintf(stderr,"ERROR on binding Telnet test\n");
@@ -194,7 +199,11 @@ int main(int argc, char *argv[])
             // }
             else
             {
-              fprintf(stderr,"cproxy made a NEW connection to sproxy, returns: %d\n", check);
+              if(bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
+              {
+                fprintf(stderr,"ERROR on binding Telnet test\n");
+                break;
+              }
             }
 
           }
