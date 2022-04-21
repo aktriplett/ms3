@@ -151,9 +151,9 @@ int main(int argc, char *argv[])
       //Begin message sending loop
       while(1)
       {
-        fprintf(stderr,"I'm about to select\n");
+        //fprintf(stderr,"I'm about to select\n");
         rv = select(n, &readfds, NULL, NULL, &tv);
-        fprintf(stderr,"I have selected\n");
+        //fprintf(stderr,"I have selected\n");
 
         if (rv == -1)
         {
@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
               else
               {
                 send(newtelnetsocket, sproxybuf, sproxyrecv, 0);//sproxyrecv - 12
-                fprintf(stderr, "Got an non-header message from sproxy\n");
+                fprintf(stderr, "Got an non-header message from sproxy: %s\n", sproxybuf);
               }
             }
           }
