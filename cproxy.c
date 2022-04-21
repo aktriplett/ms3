@@ -169,11 +169,11 @@ int main(int argc, char *argv[])
             close(SproxySocket);//close disconnected socket
             int SproxySocket = SproxyConnect(argv[2],sproxyport);
 
-            if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
-            {
-              error("ERROR on binding Telnet test");
-              break;
-            }
+            //if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
+            // {
+            //   error("ERROR on binding Telnet test");
+            //   break;
+            // }
 
             if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
             {
