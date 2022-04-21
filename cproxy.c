@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
 
             if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
             {
-              error("ERROR on binding Telnet Socket");
+              error("ERROR on binding Telnet test");
               break;
             }
 
