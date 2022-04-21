@@ -2,4 +2,4 @@ git add *; git commit -m "next commit"; git push -u origin main
 git pull; make
 ping -c 20 localhost
 ip addr show eth1
-sudo ip addr del 192.168.6.5/24 dev eth1; sudo ip addr add 192.168.6.3/24 dev eth1
+sudo ip addr del 192.168.6.3/24 dev eth1; sudo ip addr add 192.168.6.5/24 dev eth1

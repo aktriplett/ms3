@@ -103,14 +103,13 @@ int main(int argc, char *argv[])
     int sproxyport = atoi(argv[3]);
     int TelnetSocket = TelnetConnect(telnetport);
     //int SproxySocket = SproxyConnect(argv[2],sproxyport);
-
-    //listen(TelnetSocket, 5);
     //fprintf(stderr,"I'm listening on telnet\n");
 
     //telnet local host triggers this loop
+    listen(TelnetSocket, 5);
     while(1)
     {
-      listen(TelnetSocket, 5);
+      //listen(TelnetSocket, 5);
       fprintf(stderr,"I'm listening on telnet\n");
       int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
       if (newtelnetsocket <0)
