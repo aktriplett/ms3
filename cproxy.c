@@ -293,11 +293,7 @@ int main(int argc, char *argv[])
         else n = SproxySocket + 1;
       }
     fprintf(stderr,"Timed out - Closing all connections and setting new IP:\n");
-    if(ipIssue == 1)
-    {
-      close(newtelnetsocket);
-    }
-    //close(newtelnetsocket);
+    close(newtelnetsocket);
     close(SproxySocket);
   }
   return 0;
