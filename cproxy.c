@@ -59,6 +59,7 @@ int SproxyConnect(char *host, int portno)
 
 int getSessionID()
 {
+  srand(time(0));
   int rannum = 0;
   rannum = rand();
   return rannum;
