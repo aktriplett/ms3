@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-              //fprintf(stderr, "Received message from telnet\n");
+              fprintf(stderr, "Received message from telnet\n");
               //setPacket(2, telnetbuf, telnetrecv, 1);
               send(SproxySocket, telnetbuf, telnetrecv, 0);//telnetrecv + 12
               //fprintf(stderr,"Forwarding telnet message to sproxy\n");
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
               else
               {
                 send(newtelnetsocket, sproxybuf, sproxyrecv, 0);//sproxyrecv - 12
-                //fprintf(stderr, "Got an non-header message from sproxy\n");
+                fprintf(stderr, "Got an non-header message from sproxy\n");
               }
             }
           }
