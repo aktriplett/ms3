@@ -195,6 +195,7 @@ int main(int argc, char *argv[])
             if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
             {
               fprintf(stderr,"ERROR on binding Telnet test\n");
+              ipIssue = 0;
               //error("ERROR on binding Telnet test");
               break;
             }
