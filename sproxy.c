@@ -143,7 +143,9 @@ int main(int argc, char *argv[])
 
     while(1)
     {
+      fprintf(stderr,"I'm about to select\n");
       rv = select(n, &readfds, NULL, NULL, &tv);
+      fprintf(stderr,"I have selected\n");
 
       if (rv == -1)
       {
