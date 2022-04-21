@@ -110,7 +110,6 @@ int main(int argc, char *argv[])
     int telnetport = atoi(argv[1]);//port no passed in command line arg, to convert character to int we use atoi
     int sproxyport = atoi(argv[3]);
     int TelnetSocket = TelnetConnect(telnetport);
-    int ipIssue = 1;
     int newtelnetsocket = 0;
     //int SproxySocket = SproxyConnect(argv[2],sproxyport);
     //fprintf(stderr,"I'm listening on telnet\n");
@@ -119,26 +118,14 @@ int main(int argc, char *argv[])
     //listen(TelnetSocket, 5);
     while(1)
     {
-      if (ipIssue == 1)
+      listen(TelnetSocket, 5);
+      fprintf(stderr,"I'm listening on telnet\n");
+      int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
+      if (newtelnetsocket <0)
       {
-        fprintf(stderr,"IPissue in listen is:%d\n", ipIssue);
-        listen(TelnetSocket, 5);
-        fprintf(stderr,"I'm listening on telnet\n");
-        newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
-        if (newtelnetsocket <0)
-        {
-          error("ERROR on telnet accept\n");
-        }
-        fprintf(stderr,"Connected to telnet local host\n");
+        error("ERROR on telnet accept\n");
       }
-      // listen(TelnetSocket, 5);
-      // fprintf(stderr,"I'm listening on telnet\n");
-      // int newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
-      // if (newtelnetsocket <0)
-      // {
-      //   error("ERROR on telnet accept\n");
-      // }
-      // fprintf(stderr,"Connected to telnet local host\n");
+      fprintf(stderr,"Connected to telnet local host\n");
 
       //connect to sproxy
       int SproxySocket = SproxyConnect(argv[2],sproxyport);
@@ -196,8 +183,6 @@ int main(int argc, char *argv[])
             if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
             {
               fprintf(stderr,"ERROR on binding Telnet test\n");
-              ipIssue = 0;
-              fprintf(stderr,"IPissue in bind is:%d\n", ipIssue);
               //error("ERROR on binding Telnet test");
               break;
             }
