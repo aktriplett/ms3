@@ -167,8 +167,13 @@ int main(int argc, char *argv[])
             fprintf(stderr,"closing socket connection to sproxy\n");
             hbcount = 0;//reset hb count
             close(SproxySocket);//close disconnected socket
-
             int SproxySocket = SproxyConnect(argv[2],sproxyport);
+
+            if (bind(TelnetSocket, (struct sockaddr *) &telnet_addr, sizeof(telnet_addr)) < 0)
+            {
+              error("ERROR on binding Telnet Socket");
+              break;
+            }
 
             if (connect(SproxySocket, &sproxy_addr, sizeof(sproxy_addr)) < 0)
             {
