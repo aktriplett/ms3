@@ -197,7 +197,6 @@ int main(int argc, char *argv[])
             }
           }
 
-          }
           tv.tv_sec = 1;
           tv.tv_usec = 0;
         }
