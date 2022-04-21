@@ -121,6 +121,7 @@ int main(int argc, char *argv[])
     {
       if (ipIssue == 1)
       {
+        fprintf(stderr,"IPissue in listen is:%d\n", ipIssue);
         listen(TelnetSocket, 5);
         fprintf(stderr,"I'm listening on telnet\n");
         newtelnetsocket = accept(TelnetSocket, (struct sockaddr *) &telnet_addr, &len1);
@@ -196,6 +197,7 @@ int main(int argc, char *argv[])
             {
               fprintf(stderr,"ERROR on binding Telnet test\n");
               ipIssue = 0;
+              fprintf(stderr,"IPissue in bind is:%d\n", ipIssue);
               //error("ERROR on binding Telnet test");
               break;
             }
